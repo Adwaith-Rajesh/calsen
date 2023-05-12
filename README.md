@@ -8,7 +8,7 @@ A search engine to search for local files based on their contents and not just t
 
 ### Road Map
 
-- [ ] Build Util Libs for the project (HashMaps and stuff like that.)
+- [x] Build Util Libs for the project (HashMaps and stuff like that.)
 - [ ] Dynamic Parser Loading for individual files based on MIME type (getting the text content from the files)
 - [ ] Lexing the contents from the parser into tokens
 - [ ] Calculate the TF score for each token in a file
