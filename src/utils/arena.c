@@ -28,6 +28,10 @@ Arena *arena_init() {
     return new_arena;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-arith"
+// gcc support void * pointer arithmetic
+// https :  // gcc.gnu.org/onlinedocs/gcc-8.2.0/gcc/Pointer-Arith.html#Pointer-Arith
 void *arena_alloc(Arena *arena, size_t size) {
     if (arena->reg == NULL) {
         Region *new_region = _create_region(size);
@@ -54,6 +58,7 @@ void *arena_alloc(Arena *arena, size_t size) {
     prev->size += size;
     return loc;
 }
+#pragma GCC diagnostic pop
 
 void arena_free(Arena *arena) {
     Region *temp;
