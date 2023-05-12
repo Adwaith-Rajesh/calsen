@@ -2,7 +2,6 @@
 
 #include "arena.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 static Region *_create_region(size_t size) {
