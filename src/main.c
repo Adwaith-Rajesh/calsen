@@ -26,10 +26,22 @@ SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char **agrv) {
-    (void)argc;
-    (void)agrv;
+#include "cstring.h"
+#include "load_parser.h"
 
-    printf("Hello World\n");
+int main(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+
+    HashTable *parsers = load_all_parsers();
+
+    // ParseFileFn *fn = loa
+    char mime_type[] = "text/plain";
+    // printf("fn -> %p\n", load_parser_entry_point(parsers, mime_type));
+
+    load_parser_entry_point(parsers, mime_type)("");
+    ht_free_map(parsers, unload_parser);
+    ht_free(parsers);
+
     return EXIT_SUCCESS;
 }
