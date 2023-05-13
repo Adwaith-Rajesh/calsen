@@ -20,7 +20,7 @@ The `Arena` type is defined in `src/utils/Arena.h`
 By default the parsers will compiled to a shared object using the following command.
 
 ```console
-gcc -Wall -Wextra -pedantic -std=c11 -I./src -I./src/utils -shared -fPIC -o <parser-name>.so <parser-name>.c ./build/out/arena.o ./build/out/cstring.o -ldl
+gcc -Wall -Wextra -pedantic -std=c11 -I./src -I./src/utils -shared -fPIC -o <parser-name>.so <parser-name>.c ./build/out/arena.o ./build/out/cstring.o
 ```
 
 If the parser requires a special command (eg. depends on other packages .. etc), then
