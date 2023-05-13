@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define C_FLAGS "-Wall", "-Wextra", "-pedantic", "-std=c11", "-I./src", "-I./src/utils"
+#define C_FLAGS "-g", "-Wall", "-Wextra", "-std=c11", "-I./src", "-I./src/utils"
 
 #define OUT_DIR "./build/out"
 #define BIN_DIR "./build/bin"
@@ -65,6 +65,7 @@ void build_calsen() {
             line = cstr_array_append(line, PATH(out_dir, file));
         }
     });
+    line = cstr_array_append(line, "-ldl");
     Cmd cmd = {
         .line = line};
     INFO("CMD: %s", cmd_show(cmd));
@@ -111,7 +112,8 @@ void build_parsers() {
                 CMD("cc", C_FLAGS, "-shared", "-fPIC", "-o",
                     PATH("build", "parsers", CONCAT(NOEXT(file), ".so")),
                     PATH(OUT_DIR, "arena.o"),
-                    PATH(OUT_DIR, "cstring.o"));
+                    PATH(OUT_DIR, "cstring.o"),
+                    PATH("./src/parsers", file));
             }
         }
     });
