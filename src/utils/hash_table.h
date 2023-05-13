@@ -15,10 +15,13 @@ typedef struct {
     HTEntry **entries;
 } HashTable;
 
+typedef void HtFreeMapFn(void *);
+
 HashTable *ht_create(void);
 void ht_set(HashTable *, const char *, void *);
 void *ht_get(HashTable *, const char *);
-short int ht_key_exist(HashTable *, const char *);
 void ht_free(HashTable *);
+// allows you to free the keys before the table itself get freed
+void ht_free_map(HashTable *, HtFreeMapFn *);
 
 #endif

@@ -82,3 +82,15 @@ void ht_free(HashTable *table) {
     free(table->entries);
     free(table);
 }
+
+void ht_free_map(HashTable *table, HtFreeMapFn *fn) {
+    for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+        HTEntry *entry = table->entries[i];
+        if (entry != NULL) {
+            while (entry != NULL) {
+                fn(entry->value);
+                entry = entry->next;
+            }
+        }
+    }
+}
