@@ -11,10 +11,11 @@ typedef struct {
     size_t curr_p;
 } String;
 
-String *string_create(size_t size, Arena *arena);
-void string_destroy(String *string);
-void string_append_char(String *string, char ch);
-void string_print(String *string);
-String *string_create_from_charp(char *str, size_t size, Arena *arena);
+String *string_create(size_t, Arena *);
+void string_destroy(String *);
+void string_append_char(String *, char);
+void string_append_charp(String *, char *);
+void string_print(String *);
+String *string_create_from_charp(char *, size_t, Arena *);
 
 #endif

@@ -38,6 +38,13 @@ void string_append_char(String *string, char ch) {
     }
 }
 
+void string_append_charp(String *string, char *charp) {
+    size_t i = 0;
+    while (charp[i] != '\0') {
+        string_append_char(string, charp[i++]);
+    }
+}
+
 void string_print(String *string) {
     if (string == NULL) return;
     printf("%s", string->str);
