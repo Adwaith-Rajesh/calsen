@@ -82,7 +82,6 @@ ParseFileFn *load_parser_entry_point(HashTable *table, char *mime) {
     string_destroy(str);
 
     if (lib_handle == NULL) return NULL;
-    printf("after handle\n");
     // TODO: look for the arena version
     return (ParseFileFn *)dlsym(lib_handle, "parse_file");
 }
