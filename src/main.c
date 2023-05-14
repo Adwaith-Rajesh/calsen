@@ -23,15 +23,37 @@ SOFTWARE.
 
 */
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "cstring.h"
+#include "lexer.h"
+#include "linked_list.h"
 #include "load_parser.h"
+#include "path.h"
+
+void node_printer(Node *node) {
+    if (node == NULL) return;
+    printf("tok: ");
+    string_print((String *)node->data);
+    // printf("%p\n", node->data);
+    printf("\n");
+}
+
+void *free_string_token(Node *node, va_list list) {
+    (void)list;
+    if (node == NULL) return NULL;
+    string_destroy(node->data);
+    return node;
+}
 
 int main(int argc, char **argv) {
-    (void)argc;
-    (void)argv;
+    if (argc < 2) {
+        fprintf(stderr, "Usage: ./calsen <filepath>\n");
+        exit(1);
+    }
+    const char *filepath = argv[1];
 
     HashTable *parsers = load_all_parsers();
 
@@ -39,7 +61,19 @@ int main(int argc, char **argv) {
     char mime_type[] = "text/plain";
     // printf("fn -> %p\n", load_parser_entry_point(parsers, mime_type));
 
-    load_parser_entry_point(parsers, mime_type)("", NULL);
+    // printf("size-> %d\n", get_file_size(filepath));
+
+    String *str = string_create(get_file_size(filepath) + 1);
+
+    load_parser_entry_point(parsers, mime_type)(filepath, str);
+    string_print(str);
+
+    LinkedList *tok_list = file_content_to_tokens(str->str, str->size);
+    ll_print(tok_list, node_printer);
+
+    string_destroy(str);
+    ll_map(tok_list, free_string_token);
+    ll_free(tok_list);
     ht_free_map(parsers, unload_parser);
     ht_free(parsers);
 
