@@ -18,8 +18,6 @@
 #include "path.h"
 
 static void _load_lib_to_table(const char *lib_path, const char *lib_name, HashTable *table) {
-    printf("load got: %s\n", lib_path);
-
     void *lib_handle = dlopen(lib_path, RTLD_LAZY);
     if (lib_handle == NULL) return;
     ht_set(table, lib_name, lib_handle);
@@ -82,7 +80,6 @@ ParseFileFn *load_parser_entry_point(HashTable *table, char *mime) {
     string_destroy(str);
 
     if (lib_handle == NULL) return NULL;
-    // TODO: look for the arena version
     return (ParseFileFn *)dlsym(lib_handle, "parse_file");
 }
 
