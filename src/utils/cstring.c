@@ -61,9 +61,10 @@ String *string_create_from_charp(char *str, size_t size, Arena *arena) {
 
 String *string_create_from_charp_slice(CharPSlice *slice, Arena *arena) {
     String *new_str = string_create(slice->size + 1, arena);
-    for (size_t i; i < slice->size; i++) {
+    for (size_t i = 0; i < slice->size; i++) {
         string_append_char(new_str, slice->data[i]);
     }
+    return new_str;
 }
 
 void charp_slice_to_charp_array(CharPSlice *slice, char arr[]) {
