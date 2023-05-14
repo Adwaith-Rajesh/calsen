@@ -4,8 +4,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "arena.h"
-
 typedef struct Node {
     void *data;
     struct Node *next;
@@ -14,7 +12,6 @@ typedef struct Node {
 typedef struct {
     Node *head;
     size_t size;
-    Arena *arena;
 } LinkedList;
 
 typedef struct {
@@ -24,10 +21,10 @@ typedef struct {
 typedef void NodePrinterFn(Node *);
 typedef void *LinkedListMapFn(Node *, va_list);
 
-Node *create_node(void *, Arena *);
+Node *create_node(void *);
 void free_node(Node *);
 
-LinkedList *ll_init(Arena *);
+LinkedList *ll_init();
 void ll_print(LinkedList *, NodePrinterFn *);
 int ll_is_empty(LinkedList *);
 void ll_append(LinkedList *, Node *);

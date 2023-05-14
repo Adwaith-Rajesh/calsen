@@ -4,16 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "arena.h"
-
-static void *_malloc_with_check(size_t size, Arena *arena) {
-    void *ptr;
-    if (arena == NULL) {
-        ptr = malloc(size);
-    } else {
-        ptr = arena_alloc(arena, size);
-    }
-
+static void *_malloc_with_check(size_t size) {
+    void *ptr = malloc(size);
     if (ptr == NULL) {
         fprintf(stderr, "Could not allocate memory\n");
         exit(1);
@@ -21,8 +13,8 @@ static void *_malloc_with_check(size_t size, Arena *arena) {
     return ptr;
 }
 
-Node *create_node(void *data, Arena *arena) {
-    Node *new_node = (Node *)_malloc_with_check(sizeof(Node), arena);
+Node *create_node(void *data) {
+    Node *new_node = (Node *)_malloc_with_check(sizeof(Node));
     new_node->data = data;
     new_node->next = NULL;
     return new_node;
@@ -33,12 +25,11 @@ void free_node(Node *node) {
     free(node);
 }
 
-LinkedList *ll_init(Arena *arena) {
-    LinkedList *new_list = (LinkedList *)_malloc_with_check(sizeof(LinkedList), arena);
+LinkedList *ll_init() {
+    LinkedList *new_list = (LinkedList *)_malloc_with_check(sizeof(LinkedList));
 
     new_list->head = NULL;
     new_list->size = 0;
-    new_list->arena = arena;
     return new_list;
 }
 
@@ -128,7 +119,7 @@ void ll_free(LinkedList *list) {
 }
 
 LLIter *ll_iter_init(LinkedList *list) {
-    LLIter *new_iter = (LLIter *)_malloc_with_check(sizeof(LLIter), list->arena);
+    LLIter *new_iter = (LLIter *)_malloc_with_check(sizeof(LLIter));
     new_iter->curr = list->head;
     return new_iter;
 }

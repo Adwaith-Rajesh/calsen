@@ -69,20 +69,21 @@ static Token _get_next_token(Lexer *lexer, size_t content_size) {
     return (Token){{.data = NULL, .size = 0}, .token = UNKNOWN};
 }
 
-LinkedList *file_content_to_tokens(char *content, size_t size, Arena *arena) {
+LinkedList *file_content_to_tokens(char *content, size_t size) {
     Lexer lexer = {
         .content = content,
         .curr_idx = 0,
     };
 
-    LinkedList *token_list = ll_init(arena);
+    LinkedList *token_list = ll_init();
 
     while (lexer.curr_idx < size) {
         Token t = _get_next_token(&lexer, size);
 
         if (t.token == UNKNOWN && t.data.data == NULL) break;
         ll_append(token_list,
-                  create_node(string_create_from_charp_slice(&(t.data), arena), arena));
+                  create_node(string_create_from_charp_slice(&(t.data))));
+        // TODO: remove stmt
         _print_token(&t);
     }
     return token_list;

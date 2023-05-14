@@ -3,18 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "arena.h"
-
-String *string_create(size_t size, Arena *arena) {
+String *string_create(size_t size) {
     if (size < 1) return NULL;
     String *new_string;
-    if (arena == NULL) {
-        new_string = malloc(sizeof(String));
-        new_string->str = malloc(sizeof(char) * size);
-    } else {
-        new_string = arena_alloc(arena, sizeof(String));
-        new_string->str = arena_alloc(arena, sizeof(char) * size);
-    }
+
+    new_string = malloc(sizeof(String));
+    new_string->str = malloc(sizeof(char) * size);
 
     new_string->str[0] = '\0';
     new_string->curr_p = 0;
@@ -50,8 +44,8 @@ void string_print(String *string) {
     printf("%s", string->str);
 }
 
-String *string_create_from_charp(char *str, size_t size, Arena *arena) {
-    String *new_string = string_create(size + 1, arena);
+String *string_create_from_charp(char *str, size_t size) {
+    String *new_string = string_create(size + 1);
     size_t i = 0;
     while (str[i] != '\0') {
         string_append_char(new_string, str[i++]);
@@ -59,8 +53,8 @@ String *string_create_from_charp(char *str, size_t size, Arena *arena) {
     return new_string;
 }
 
-String *string_create_from_charp_slice(CharPSlice *slice, Arena *arena) {
-    String *new_str = string_create(slice->size + 1, arena);
+String *string_create_from_charp_slice(CharPSlice *slice) {
+    String *new_str = string_create(slice->size + 1);
     for (size_t i = 0; i < slice->size; i++) {
         string_append_char(new_str, slice->data[i]);
     }

@@ -52,7 +52,7 @@ HashTable *load_all_parsers() {
         char *dot = strrchr(d->d_name, '.');  // find the last dot(.)
 
         if (dot == NULL) continue;
-        shared_lib_path = string_create_from_charp(resolved_path, 256, NULL);
+        shared_lib_path = string_create_from_charp(resolved_path, 256);
         if (strcmp(dot, ".so") == 0) {
             string_append_char(shared_lib_path, '/');
             string_append_charp(shared_lib_path, d->d_name);
@@ -74,7 +74,7 @@ ParseFileFn *load_parser_entry_point(HashTable *table, char *mime) {
             mime[i] = '_';
     }
 
-    String *str = string_create_from_charp(mime, 50, NULL);
+    String *str = string_create_from_charp(mime, 50);
     string_append_charp(str, ".so");
     void *lib_handle = ht_get(table, str->str);
     string_destroy(str);
