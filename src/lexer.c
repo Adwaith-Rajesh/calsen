@@ -75,11 +75,15 @@ LinkedList *file_content_to_tokens(char *content, size_t size, Arena *arena) {
         .curr_idx = 0,
     };
 
+    LinkedList *token_list = ll_init(arena);
+
     while (lexer.curr_idx < size) {
         Token t = _get_next_token(&lexer, size);
 
         if (t.token == UNKNOWN && t.data.data == NULL) break;
-
+        ll_append(token_list,
+                  create_node(string_create_from_charp_slice(&(t.data), arena), arena));
         _print_token(&t);
     }
+    return token_list;
 }
