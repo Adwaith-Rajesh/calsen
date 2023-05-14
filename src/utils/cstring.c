@@ -5,10 +5,6 @@
 
 #include "arena.h"
 
-// TODO: Create a CharpSlice type. (Store the start pointer and the size)
-// TODO: add String *string_create_from_chap_slice(CharpSlice*, Arena *);
-// TODO: add void charp_slice_copy(CharpSlice*, char*);
-
 String *string_create(size_t size, Arena *arena) {
     if (size < 1) return NULL;
     String *new_string;
@@ -61,4 +57,25 @@ String *string_create_from_charp(char *str, size_t size, Arena *arena) {
         string_append_char(new_string, str[i++]);
     }
     return new_string;
+}
+
+String *string_create_from_charp_slice(CharPSlice *slice, Arena *arena) {
+    String *new_str = string_create(slice->size + 1, arena);
+    for (size_t i; i < slice->size; i++) {
+        string_append_char(new_str, slice->data[i]);
+    }
+}
+
+void charp_slice_to_charp_array(CharPSlice *slice, char arr[]) {
+    size_t i = 0;
+    for (; i < slice->size; i++) {
+        arr[i] = slice->data[i];
+    }
+    arr[i] = '\0';
+}
+
+void charp_slice_print(CharPSlice *slice) {
+    char temp_arr[slice->size + 1];
+    charp_slice_to_charp_array(slice, temp_arr);
+    printf("%s", temp_arr);
 }
