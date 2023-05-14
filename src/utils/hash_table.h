@@ -1,7 +1,7 @@
 #ifndef _INCLUDE_HASH_TABLE
 #define _INCLUDE_HASH_TABLE
 
-#define HASH_TABLE_SIZE 1000
+#define HASH_TABLE_SIZE 2500
 
 #include <stdlib.h>
 

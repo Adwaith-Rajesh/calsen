@@ -75,9 +75,17 @@ void ht_free(HashTable *table) {
     if (table == NULL) return;
 
     for (size_t i = 0; i < HASH_TABLE_SIZE; ++i) {
-        if (table->entries[i] == NULL) continue;
-        free(table->entries[i]->key);
-        free(table->entries[i]);
+        HTEntry *entry = table->entries[i];
+
+        if (entry == NULL) continue;
+
+        HTEntry *temp;
+        while (entry != NULL) {
+            free(entry->key);
+            temp = entry;
+            entry = entry->next;
+            free(temp);
+        }
     }
     free(table->entries);
     free(table);
