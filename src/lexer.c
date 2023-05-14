@@ -20,6 +20,9 @@ there, was, a, fox, that, could, not, jump, ., Ha, Ha, 1, :, 23
 
 typedef int TokenCreateCond(int);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+
 static const char *_get_token_name(token_t token_type) {
     switch (token_type) {
         case STRING:
@@ -38,6 +41,8 @@ static void _print_token(Token *t) {
     charp_slice_print(&(t->data));
     printf("\n");
 }
+
+#pragma GCC diagnostic pop
 
 static Token _create_next_token(Lexer *lexer, TokenCreateCond *cond, token_t token_type) {
     int curr_c = (int)(lexer->content[lexer->curr_idx]);
@@ -83,8 +88,6 @@ LinkedList *file_content_to_tokens(char *content, size_t size) {
         if (t.token == UNKNOWN && t.data.data == NULL) break;
         ll_append(token_list,
                   create_node(string_create_from_charp_slice(&(t.data))));
-        // TODO: remove stmt
-        _print_token(&t);
     }
     return token_list;
 }
