@@ -2,8 +2,10 @@
 
 #define _XOPEN_SOURCE 500
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -25,4 +27,13 @@ char *get_absolute_path(const char *path, char *resolved_path) {
         exit(EXIT_FAILURE);
     }
     return r;
+}
+
+int get_file_size(const char *path) {
+    struct stat st;
+    if (stat(path, &st) != 0) {
+        fprintf(stderr, "could not find file: %s : %s\n", path, strerror(errno));
+        exit(1);
+    }
+    return st.st_size;
 }

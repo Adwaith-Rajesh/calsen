@@ -3,5 +3,6 @@
 
 int is_dir(const char *);
 char *get_absolute_path(const char *, char *);
+int get_file_size(const char *);
 
 #endif
