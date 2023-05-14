@@ -4,23 +4,18 @@ The parsers are named after the [MIME type](https://en.wikipedia.org/wiki/Media_
 Example:
 if the MIME type is `text/plain`, the name of the parser file will be `text_plain.c`. (The `/` is replaced with `_`)
 
-Every parser defined must have a `String *parse_file(const char *path)` function as an entry point to the parser.
+Every parser defined must have a `void parse_file(const char *path, String *content_string)` function as an entry point to the parser.
 
-Since [`calsen`](https://github.com/Adwaith-Rajesh/calsen) also implements an Arena allocator, if `String *parse_file_arena(const char *path, Arena *arena)` is defined.
-Then it will be used.
-
-The returned `String *` has to be freed by the user and not by the parser.
+The contents of parser file will be store in the String provided.
 
 The `String` type is defined in `src/utils/cstring.h`
-
-The `Arena` type is defined in `src/utils/Arena.h`
 
 ## compilation
 
 By default the parsers will compiled to a shared object using the following command.
 
 ```console
-gcc -Wall -Wextra -pedantic -std=c11 -I./src -I./src/utils -shared -fPIC -o <parser-name>.so <parser-name>.c ./build/out/arena.o ./build/out/cstring.o
+gcc -Wall -Wextra -pedantic -std=c11 -I./src -I./src/utils -shared -fPIC -o <parser-name>.so <parser-name>.c ./build/out/cstring.o
 ```
 
 If the parser requires a special command (eg. depends on other packages .. etc), then

@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
     char mime_type[] = "text/plain";
     // printf("fn -> %p\n", load_parser_entry_point(parsers, mime_type));
 
-    load_parser_entry_point(parsers, mime_type)("");
+    load_parser_entry_point(parsers, mime_type)("", NULL);
     ht_free_map(parsers, unload_parser);
     ht_free(parsers);
 

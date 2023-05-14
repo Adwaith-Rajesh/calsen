@@ -3,7 +3,7 @@
 
 #include "hash_table.h"
 
-typedef String *ParseFileFn(const char *);
+typedef void ParseFileFn(const char *, String *);
 
 HashTable *load_all_parsers();
 ParseFileFn *load_parser_entry_point(HashTable *, char *);

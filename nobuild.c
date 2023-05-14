@@ -111,7 +111,6 @@ void build_parsers() {
             if (!custom_parser_check_execute(file)) {
                 CMD("cc", C_FLAGS, "-shared", "-fPIC", "-o",
                     PATH("build", "parsers", CONCAT(NOEXT(file), ".so")),
-                    PATH(OUT_DIR, "arena.o"),
                     PATH(OUT_DIR, "cstring.o"),
                     PATH("./src/parsers", file));
             }
