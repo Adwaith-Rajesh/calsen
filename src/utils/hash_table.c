@@ -102,3 +102,15 @@ void ht_free_map(HashTable *table, HtFreeMapFn *fn) {
         }
     }
 }
+
+void ht_print(HashTable *table, HTValuePrintFn *fn) {
+    for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+        HTEntry *entry = table->entries[i];
+        while (entry != NULL) {
+            printf("(%s, ", entry->key);
+            fn(entry->value);
+            puts(")");
+            entry = entry->next;
+        }
+    }
+}

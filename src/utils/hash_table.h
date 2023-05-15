@@ -16,6 +16,7 @@ typedef struct {
 } HashTable;
 
 typedef void HtFreeMapFn(void *);
+typedef void HTValuePrintFn(void *);
 
 HashTable *ht_create(void);
 void ht_set(HashTable *, const char *, void *);
@@ -23,5 +24,6 @@ void *ht_get(HashTable *, const char *);
 void ht_free(HashTable *);
 // allows you to free the keys before the table itself get freed
 void ht_free_map(HashTable *, HtFreeMapFn *);
+void ht_print(HashTable *, HTValuePrintFn *);
 
 #endif
