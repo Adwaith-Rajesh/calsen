@@ -25,5 +25,5 @@ void ht_free(HashTable *);
 // allows you to free the keys before the table itself get freed
 void ht_free_map(HashTable *, HtFreeMapFn *);
 void ht_print(HashTable *, HTValuePrintFn *);
-
+size_t ht_get_size(HashTable *);
 #endif

@@ -84,6 +84,7 @@ int main(int argc, char **argv) {
     printf("calculated the TF score\n");
 
     ht_print(tf_vals, print_tf_val_ht);
+    printf("%ld\n", ht_get_size(tf_vals));
 
     string_destroy(str);
     ll_map(tok_list, free_string_token);

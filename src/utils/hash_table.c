@@ -114,3 +114,15 @@ void ht_print(HashTable *table, HTValuePrintFn *fn) {
         }
     }
 }
+
+size_t ht_get_size(HashTable *table) {
+    size_t size = 0;
+    for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+        HTEntry *entry = table->entries[i];
+        while (entry != NULL) {
+            size++;
+            entry = entry->next;
+        }
+    }
+    return size;
+}
