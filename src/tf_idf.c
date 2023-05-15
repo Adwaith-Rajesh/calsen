@@ -69,8 +69,8 @@ static void _calculate_tf_value_for_entry(HTEntry *entry, va_list args) {
     int token_count = *((int *)(entry->value));
     free(entry->value);  // free the existing int value
     // create space for the new float value to be stores in the  entry
-    float *tf_val = malloc(sizeof(float));
-    *tf_val = (float)token_count / (float)table_size;
+    double *tf_val = malloc(sizeof(double));
+    *tf_val = (double)token_count / (double)table_size;
     entry->value = tf_val;
 }
 

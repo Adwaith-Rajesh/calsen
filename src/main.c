@@ -51,7 +51,7 @@ void *free_string_token(Node *node, va_list list) {
 
 void print_tf_val_ht(void *val) {
     if (val == NULL) return;
-    printf("%lf", *((float *)val));
+    printf("%.12lf", *((double *)val));
 }
 
 // void
