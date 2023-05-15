@@ -23,7 +23,9 @@ there, was, a, fox, that, could, not, jump, ., Ha, Ha, 1, :, 23
 This function is as function to map overt the token list
 */
 static void *_to_lowercase(Node *node, va_list arg_list) {
-    (void)arg_list;
+    va_list args_copy;
+    va_copy(args_copy, arg_list);
+    (*(va_arg(args_copy, int *)))++;  // inc the total count
     if (node == NULL) return NULL;
     String *str = (String *)(node->data);
     int i = 0;
@@ -65,7 +67,12 @@ static CharPSlice _get_next_token(Lexer *lexer, size_t content_size) {
     return (CharPSlice){.data = NULL, .size = 0};
 }
 
-LinkedList *file_content_to_tokens(char *content, size_t size) {
+/*
+The token_count is necessary as lexing is the only time we know total number of
+tokens parses. i.e the number of token before they were converted to lowercase.
+This is necessary as calculating the tf requires the original token count
+*/
+LinkedList *file_content_to_tokens(char *content, size_t size, int *token_count) {
     Lexer lexer = {
         .content = content,
         .curr_idx = 0,
@@ -80,6 +87,6 @@ LinkedList *file_content_to_tokens(char *content, size_t size) {
         ll_append_left(token_list,
                        create_node(string_create_from_charp_slice(&t)));
     }
-    ll_map(token_list, _to_lowercase);
+    ll_map(token_list, _to_lowercase, token_count);
     return token_list;
 }

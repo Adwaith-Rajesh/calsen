@@ -51,7 +51,7 @@ void *free_string_token(Node *node, va_list list) {
 
 void print_tf_val_ht(void *val) {
     if (val == NULL) return;
-    printf("%d", *((int *)val));
+    printf("%lf", *((float *)val));
 }
 
 // void
@@ -76,15 +76,18 @@ int main(int argc, char **argv) {
     load_parser_entry_point(parsers, mime_type)(filepath, str);
     // string_print(str);
     printf("start tokenize\n");
-    LinkedList *tok_list = file_content_to_tokens(str->str, str->size);
+    int original_token_count = 0;
+    LinkedList *tok_list = file_content_to_tokens(str->str, str->size, &original_token_count);
     printf("got the tokens\n");
     // ll_print(tok_list, node_printer);
     printf("start calculating the TF\n");
     HashTable *tf_vals = token_count(tok_list);
+    calculate_tf(tf_vals, original_token_count);
+
     printf("calculated the TF score\n");
 
     ht_print(tf_vals, print_tf_val_ht);
-    printf("%ld\n", ht_get_size(tf_vals));
+    printf("%ld : %d\n", ht_get_size(tf_vals), original_token_count);
 
     string_destroy(str);
     ll_map(tok_list, free_string_token);

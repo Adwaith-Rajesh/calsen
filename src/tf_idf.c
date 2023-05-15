@@ -61,15 +61,24 @@ HashTable *token_count(LinkedList *token_list) {
     return ht;
 }
 
-void calculate_tf(HashTable *tf_values) {
+static void _calculate_tf_value_for_entry(HTEntry *entry, va_list args) {
+    va_list args_copy;
+    va_copy(args_copy, args);
+    size_t table_size = va_arg(args_copy, size_t);
+
+    int token_count = *((int *)(entry->value));
+    free(entry->value);  // free the existing int value
+    // create space for the new float value to be stores in the  entry
+    float *tf_val = malloc(sizeof(float));
+    *tf_val = (float)token_count / (float)table_size;
+    entry->value = tf_val;
+}
+
+void calculate_tf(HashTable *tf_values, int token_count) {
+    ht_entry_map(tf_values, _calculate_tf_value_for_entry, token_count);
 }
 
 void tf_table_free_int(void *int_val) {
     if (int_val == NULL) return;
     free(int_val);
 }
-
-// TODO: the TF value must be a float rather than int.
-// each value has to divided by the total number of token in the file.
-// TODO: add a function to the hash table to count the number of keys in the table
-// TODO: convert each token to lowercase

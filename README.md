@@ -11,7 +11,7 @@ A search engine to search for local files based on their contents and not just t
 - [x] Build Util Libs for the project (HashMaps and stuff like that.)
 - [x] Dynamic Parser Loading for individual files based on MIME type (getting the text content from the files)
 - [x] Lexing the contents from the parser into tokens
-- [ ] Calculate the TF score for each token in a file
+- [x] Calculate the TF score for each token in a file
   - Calsen uses [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) for ranking files based on the query.
 - [ ] Do the above step for all the files in a specified directory
 - [ ] Figure out a way to store the indexed data.
