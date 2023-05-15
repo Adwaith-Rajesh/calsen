@@ -75,10 +75,13 @@ int main(int argc, char **argv) {
 
     load_parser_entry_point(parsers, mime_type)(filepath, str);
     // string_print(str);
-
+    printf("start tokenize\n");
     LinkedList *tok_list = file_content_to_tokens(str->str, str->size);
+    printf("got the tokens\n");
     // ll_print(tok_list, node_printer);
+    printf("start calculating the TF\n");
     HashTable *tf_vals = calculate_tf(tok_list);
+    printf("calculated the TF score\n");
 
     ht_print(tf_vals, print_tf_val_ht);
 

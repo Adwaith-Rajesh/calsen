@@ -62,8 +62,8 @@ LinkedList *file_content_to_tokens(char *content, size_t size) {
         CharPSlice t = _get_next_token(&lexer, size);
 
         if ((t.data == NULL) && (t.size = 0)) break;
-        ll_append(token_list,
-                  create_node(string_create_from_charp_slice(&t)));
+        ll_append_left(token_list,
+                       create_node(string_create_from_charp_slice(&t)));
     }
     return token_list;
 }
