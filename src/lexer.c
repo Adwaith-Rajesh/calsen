@@ -1,6 +1,7 @@
 #include "lexer.h"
 
 #include <ctype.h>
+#include <stdarg.h>
 #include <stdlib.h>
 
 #include "cstring.h"
@@ -17,6 +18,21 @@ there was a fox that could not jump. Ha Ha
     v
 there, was, a, fox, that, could, not, jump, ., Ha, Ha, 1, :, 23
 */
+
+/*
+This function is as function to map overt the token list
+*/
+static void *_to_lowercase(Node *node, va_list arg_list) {
+    (void)arg_list;
+    if (node == NULL) return NULL;
+    String *str = (String *)(node->data);
+    int i = 0;
+    while (str->str[i] != '\0') {
+        str->str[i] = tolower(str->str[i]);
+        i++;
+    }
+    return node->data;
+}
 
 typedef int TokenCreateCond(int);
 
@@ -65,5 +81,6 @@ LinkedList *file_content_to_tokens(char *content, size_t size) {
         ll_append_left(token_list,
                        create_node(string_create_from_charp_slice(&t)));
     }
+    ll_map(token_list, _to_lowercase);
     return token_list;
 }
