@@ -57,10 +57,9 @@ static CharPSlice _get_next_token(Lexer *lexer, size_t content_size) {
             return _create_next_token(lexer, isdigit);
         } else if (isalpha(curr_c)) {
             return _create_next_token(lexer, isalpha);
-        } else if (ispunct(curr_c)) {
-            return _create_next_token(lexer, ispunct);
         }
-
+        // it's okay to void punctuation marks as it introduces unwanted noise.
+        // might add it back if found necessary.
         lexer->curr_idx++;
     }
     return (CharPSlice){.data = NULL, .size = 0};
