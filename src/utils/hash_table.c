@@ -115,6 +115,23 @@ void ht_print(HashTable *table, HTValuePrintFn *fn) {
     }
 }
 
+/*
+Get the raw entry from the Hash Table and then modify it however you want.
+If the next field is modified, unexpected behavior can occur
+*/
+void ht_entry_map(HashTable *table, HtEntryMapFn *fn, ...) {
+    va_list args;
+    va_start(args, fn);
+    for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+        HTEntry *entry = table->entries[i];
+        while (entry != NULL) {
+            fn(entry, args);
+            entry = entry->next;
+        }
+    }
+    va_end(args);
+}
+
 size_t ht_get_size(HashTable *table) {
     size_t size = 0;
     for (int i = 0; i < HASH_TABLE_SIZE; i++) {
