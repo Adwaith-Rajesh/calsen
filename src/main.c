@@ -32,6 +32,7 @@ SOFTWARE.
 #include "linked_list.h"
 #include "load_parser.h"
 #include "path.h"
+#include "tf_idf.h"
 
 void node_printer(Node *node) {
     if (node == NULL) return;
@@ -47,6 +48,13 @@ void *free_string_token(Node *node, va_list list) {
     string_destroy(node->data);
     return node;
 }
+
+void print_tf_val_ht(void *val) {
+    if (val == NULL) return;
+    printf("%d", *((int *)val));
+}
+
+// void
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -66,15 +74,20 @@ int main(int argc, char **argv) {
     String *str = string_create(get_file_size(filepath) + 1);
 
     load_parser_entry_point(parsers, mime_type)(filepath, str);
-    string_print(str);
+    // string_print(str);
 
     LinkedList *tok_list = file_content_to_tokens(str->str, str->size);
-    ll_print(tok_list, node_printer);
+    // ll_print(tok_list, node_printer);
+    HashTable *tf_vals = calculate_tf(tok_list);
+
+    ht_print(tf_vals, print_tf_val_ht);
 
     string_destroy(str);
     ll_map(tok_list, free_string_token);
     ll_free(tok_list);
     ht_free_map(parsers, unload_parser);
+    ht_free_map(tf_vals, tf_table_free_int);
+    ht_free(tf_vals);
     ht_free(parsers);
 
     return EXIT_SUCCESS;
