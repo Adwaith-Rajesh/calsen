@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     printf("got the tokens\n");
     // ll_print(tok_list, node_printer);
     printf("start calculating the TF\n");
-    HashTable *tf_vals = calculate_tf(tok_list);
+    HashTable *tf_vals = token_count(tok_list);
     printf("calculated the TF score\n");
 
     ht_print(tf_vals, print_tf_val_ht);

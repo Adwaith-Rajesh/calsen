@@ -40,7 +40,7 @@ void tf_table_free_int(void *);
 
 by mapping the function onto the table
 */
-HashTable *calculate_tf(LinkedList *token_list) {
+HashTable *token_count(LinkedList *token_list) {
     HashTable *ht = ht_create();
     LLIter *iter = ll_iter_init(token_list);
 
@@ -59,6 +59,9 @@ HashTable *calculate_tf(LinkedList *token_list) {
 
     ll_iter_free(iter);
     return ht;
+}
+
+void calculate_tf(HashTable *tf_values) {
 }
 
 void tf_table_free_int(void *int_val) {

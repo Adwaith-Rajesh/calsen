@@ -4,7 +4,7 @@
 #include "hash_table.h"
 #include "linked_list.h"
 
-HashTable *calculate_tf(LinkedList *);
+HashTable *token_count(LinkedList *);
 void tf_table_free_int(void *);
 
 #endif
