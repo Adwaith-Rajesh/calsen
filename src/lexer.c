@@ -20,58 +20,34 @@ there, was, a, fox, that, could, not, jump, ., Ha, Ha, 1, :, 23
 
 typedef int TokenCreateCond(int);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
-
-static const char *_get_token_name(token_t token_type) {
-    switch (token_type) {
-        case STRING:
-            return "STRING";
-        case NUMBER:
-            return "NUMBER";
-        case PUNCT:
-            return "PUNCT";
-        default:
-            return "UNKNOWN";
-    }
-}
-
-static void _print_token(Token *t) {
-    printf("%s: ", _get_token_name(t->token));
-    charp_slice_print(&(t->data));
-    printf("\n");
-}
-
-#pragma GCC diagnostic pop
-
-static Token _create_next_token(Lexer *lexer, TokenCreateCond *cond, token_t token_type) {
-    int curr_c = (int)(lexer->content[lexer->curr_idx]);
-    Token token = {
-        .data = {.data = lexer->content + lexer->curr_idx, .size = 0},
-        .token = token_type,
+static CharPSlice _create_next_token(Lexer *lexer, TokenCreateCond *cond) {
+    int curr_c = (int)(lexer->content[lexer->curr_idx]);  // current char
+    CharPSlice slice = {
+        .data = lexer->content + lexer->curr_idx,
+        .size = 0,
     };
 
     while (cond(curr_c)) {
-        token.data.size++;
+        slice.size++;
         curr_c = lexer->content[++lexer->curr_idx];
     }
-    return token;
+    return slice;
 }
 
-static Token _get_next_token(Lexer *lexer, size_t content_size) {
+static CharPSlice _get_next_token(Lexer *lexer, size_t content_size) {
     while (lexer->curr_idx < content_size) {
         int curr_c = (int)(lexer->content[lexer->curr_idx]);
         if (isdigit(curr_c)) {
-            return _create_next_token(lexer, isdigit, NUMBER);
+            return _create_next_token(lexer, isdigit);
         } else if (isalpha(curr_c)) {
-            return _create_next_token(lexer, isalpha, STRING);
+            return _create_next_token(lexer, isalpha);
         } else if (ispunct(curr_c)) {
-            return _create_next_token(lexer, ispunct, PUNCT);
+            return _create_next_token(lexer, ispunct);
         }
 
         lexer->curr_idx++;
     }
-    return (Token){{.data = NULL, .size = 0}, .token = UNKNOWN};
+    return (CharPSlice){.data = NULL, .size = 0};
 }
 
 LinkedList *file_content_to_tokens(char *content, size_t size) {
@@ -83,11 +59,11 @@ LinkedList *file_content_to_tokens(char *content, size_t size) {
     LinkedList *token_list = ll_init();
 
     while (lexer.curr_idx < size) {
-        Token t = _get_next_token(&lexer, size);
+        CharPSlice t = _get_next_token(&lexer, size);
 
-        if (t.token == UNKNOWN && t.data.data == NULL) break;
+        if ((t.data == NULL) && (t.size = 0)) break;
         ll_append(token_list,
-                  create_node(string_create_from_charp_slice(&(t.data))));
+                  create_node(string_create_from_charp_slice(&t)));
     }
     return token_list;
 }

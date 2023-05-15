@@ -6,18 +6,6 @@
 #include "cstring.h"
 #include "linked_list.h"
 
-typedef enum {
-    STRING,
-    NUMBER,
-    PUNCT,
-    UNKNOWN
-} token_t;
-
-typedef struct {
-    CharPSlice data;
-    token_t token;
-} Token;
-
 typedef struct {
     char *content;
     size_t curr_idx;
