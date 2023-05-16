@@ -1,3 +1,9 @@
 [ ] Create the CLI
     - [ ] sub commands to index re-index
     - [ ] during indexing add paths to multiple dirs
+
+
+
+
+optional features that I might add
+[ ] make the libmagic dependency optional
