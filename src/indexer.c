@@ -16,21 +16,43 @@ token1=0.444
 token1=0.444
 token1=0.444
 */
+
 #include "indexer.h"
 
+#include <dirent.h>
+#include <linux/limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 #include "cstring.h"
 #include "hash_table.h"
 #include "linked_list.h"
-LinkedList *get_file_to_index(const char *dirpath) {}
+
+/*
+Recursively traverse / walk a directory, then the full path along the files MIME type
+stored in the linked list
+
+NOTE:
+get_file_to_index, avoids the usage of nftw FTW(3), as there are no easy ways to pass custom
+arguments to the function called by it [at least none that I know of] (we need to add things to a linked list). other than
+making the required variable global, which is a complete NO NO from me.
+*/
+void get_files_to_index(const char *dirpath, LinkedList *list) {
+    DIR *dir;
+    struct dirent *entry;
+
+    if ((dir = opendir(dirpath)) == NULL) return;
+    while ((entry = readdir(dir)) != NULL) {
+        // TODO: complete this: Good night
+    }
+}
 
 /*
 
-The hash table that is loaded or the table that is generated is generated
+The hash table that is loaded or the table that is generated
 will be of the following type
 
 {
@@ -83,13 +105,12 @@ static void _dump_index_map_ht_as_val(HTEntry *entry, va_list args) {
     // this dump function will take case writing the file name to the indexer file
 
     if (entry == NULL) return;
-    // the max size fo a filepath in linux is 256 +
-    // assumption that the max word length on a file would be 100, 512 is a nice line size
+    // the max size fo a filepath in linux is PATH_MAX(4096) +
     va_list args_copy;
     va_copy(args_copy, args);
 
     FILE *fp = va_arg(args_copy, FILE *);
-    String *line = string_create(512);
+    String *line = string_create(PATH_MAX);
 
     string_append_charp(line, ":filename=");
     string_append_charp(line, entry->key);
