@@ -1,0 +1,3 @@
+[ ] Create the CLI
+    - [ ] sub commands to index re-index
+    - [ ] during indexing add paths to multiple dirs
