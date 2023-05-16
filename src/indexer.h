@@ -8,6 +8,6 @@
 LinkedList *get_file_to_index(const char *);
 
 HashTable *load_index(const char *);
-void *dump_index(const char *, HashTable *);
+void dump_index(const char *, HashTable *);
 
 #endif

@@ -105,11 +105,9 @@ static void _dump_index_map_ht_as_val(HTEntry *entry, va_list args) {
     string_destroy(line);
 }
 
-void *dump_index(const char *filepath, HashTable *table) {
+void dump_index(const char *filepath, HashTable *table) {
     FILE *fp = fopen(filepath, "w");
     fseek(fp, 0, SEEK_SET);
-
     ht_entry_map(table, _dump_index_map_ht_as_val, fp);
-
     fclose(fp);
 }
