@@ -88,8 +88,6 @@ static void _dump_index_map_ht_as_val(HTEntry *entry, va_list args) {
     va_list args_copy;
     va_copy(args_copy, args);
 
-    printf("one entry\n");
-
     FILE *fp = va_arg(args_copy, FILE *);
     String *line = string_create(512);
 

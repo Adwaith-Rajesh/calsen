@@ -28,6 +28,7 @@ SOFTWARE.
 #include <stdlib.h>
 
 #include "cstring.h"
+#include "indexer.h"
 #include "lexer.h"
 #include "linked_list.h"
 #include "load_parser.h"
@@ -86,8 +87,14 @@ int main(int argc, char **argv) {
 
     printf("calculated the TF score\n");
 
-    ht_print(tf_vals, print_tf_val_ht);
-    printf("%ld : %d\n", ht_get_size(tf_vals), original_token_count);
+    // ht_print(tf_vals, print_tf_val_ht);
+    // printf("%ld : %d\n", ht_get_size(tf_vals), original_token_count);
+
+    /* =============== indexer test =============== */
+    HashTable *ht_filenames = ht_create();
+    char full_path[512];
+    ht_set(ht_filenames, get_absolute_path(argv[1], full_path), tf_vals);
+    dump_index("sample.index", ht_filenames);
 
     string_destroy(str);
     ll_map(tok_list, free_string_token);
@@ -95,6 +102,7 @@ int main(int argc, char **argv) {
     ht_free_map(parsers, unload_parser);
     ht_free_map(tf_vals, tf_table_free_int);
     ht_free(tf_vals);
+    ht_free(ht_filenames);
     ht_free(parsers);
 
     return EXIT_SUCCESS;
