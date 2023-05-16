@@ -74,3 +74,12 @@ void charp_slice_print(CharPSlice *slice) {
     charp_slice_to_charp_array(slice, temp_arr);
     printf("%s", temp_arr);
 }
+
+void string_reset(String *string) {
+    // we kind of have to remove the null byte that was prev set
+    // might hinder with other standard lib function.
+    // so fo now the best approach is to just replace it with some random character
+    string->str[string->curr_p] = '$';
+    string->curr_p = 0;
+    string->str[0] = '\0';
+}
