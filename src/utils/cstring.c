@@ -32,7 +32,7 @@ void string_append_char(String *string, char ch) {
     }
 }
 
-void string_append_charp(String *string, char *charp) {
+void string_append_charp(String *string, const char *charp) {
     size_t i = 0;
     while (charp[i] != '\0') {
         string_append_char(string, charp[i++]);
@@ -44,7 +44,7 @@ void string_print(String *string) {
     printf("%s", string->str);
 }
 
-String *string_create_from_charp(char *str, size_t size) {
+String *string_create_from_charp(const char *str, size_t size) {
     String *new_string = string_create(size + 1);
     size_t i = 0;
     while (str[i] != '\0') {
