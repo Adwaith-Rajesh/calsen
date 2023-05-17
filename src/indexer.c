@@ -129,7 +129,24 @@ key, "points" to another hash table where each key is token with its tf value
 
 /* =============== Load the contents from the file =============== */
 
+// check if the char can be appended, otherwise create a new string
+// with double the size. It' static as indexer might be the only place where this is needed
+static String *_string_expandable_append(String *str, char c) {
+    if (str->curr_p < str->size - 1) {
+        string_append_char(str, c);
+        return str;
+    } else {
+        String *new_string = string_create_from_charp(str->str, str->size * 2);
+        string_destroy(str);
+        return new_string;
+    }
+    return NULL;
+}
+
 HashTable *load_index(const char *index_file) {
+    // options
+    // 1. parse character by char
+    // 2. read an entire line, then parse
 }
 
 /* =============== Dump the contents to a file =============== */
