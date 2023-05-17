@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define CC "cc"  // use the default compiler to compile the code
 #define C_FLAGS "-g", "-Wall", "-Wextra", "-std=c11", "-I./src", "-I./src/utils"
 
 #define OUT_DIR "./build/out"
@@ -16,7 +17,7 @@ typedef struct {
 } CParserCompileCommand;  // custom parser compile command
 
 static void _build_object_file(const char *file, const char *o_path) {
-    CMD("cc", C_FLAGS, "-o",
+    CMD(CC, C_FLAGS, "-o",
         PATH("build", "out", CONCAT(NOEXT(file), ".o")),
         "-c",
         o_path);
@@ -57,7 +58,7 @@ void build_calsen() {
     const char *out_dir = "./build/out";
     const char *bin_dir = "./build/bin";
 
-    Cstr_Array line = cstr_array_make("cc", C_FLAGS, "-o",
+    Cstr_Array line = cstr_array_make(CC, C_FLAGS, "-o",
                                       PATH(bin_dir, "calsen"),
                                       NULL);
     FOREACH_FILE_IN_DIR(file, out_dir, {
@@ -78,7 +79,7 @@ int custom_parser_check_execute(Cstr file) {
         // {
         //     .parser_file_name = "text_plain.c",
         //     .cmd = (Cmd){
-        //         .line = cstr_array_make("cc", C_FLAGS, "-c",  //
+        //         .line = cstr_array_make(CC, C_FLAGS, "-c",  //
         //                                 PATH("src", "parsers", "text_plain.c"), "-o",
         //                                 PATH("build", "parsers", "text_plain.o"),
         //                                 NULL),
@@ -109,7 +110,7 @@ void build_parsers() {
     FOREACH_FILE_IN_DIR(file, "./src/parsers", {
         if (ENDS_WITH(file, ".c")) {
             if (!custom_parser_check_execute(file)) {
-                CMD("cc", C_FLAGS, "-shared", "-fPIC", "-o",
+                CMD(CC, C_FLAGS, "-shared", "-fPIC", "-o",
                     PATH("build", "parsers", CONCAT(NOEXT(file), ".so")),
                     PATH(OUT_DIR, "cstring.o"),
                     PATH("./src/parsers", file));
