@@ -21,15 +21,49 @@ token1=0.444
 
 #include <dirent.h>
 #include <linux/limits.h>
+#include <magic.h>  // sudo apt install libmagic-dev
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "cstring.h"
 #include "hash_table.h"
 #include "linked_list.h"
+#include "path.h"
+
+// =============== Getting the files ===============
+
+static String *_get_mime_type(char *filename) {
+    magic_t magic;
+    const char *mime_type;
+
+    magic = magic_open(MAGIC_MIME_TYPE);
+    magic_load(magic, NULL);
+    mime_type = magic_file(magic, filename);
+
+    String *mime_string = string_create_from_charp(mime_type, strlen(mime_type));
+    magic_close(magic);
+    return mime_string;
+}
+
+FileWithMIME *create_file_with_mime(String *filename, String *mime_type) {
+    FileWithMIME *fwm = malloc(sizeof(FileWithMIME));
+    if (fwm == NULL) return NULL;
+    fwm->filepath = filename;
+    fwm->mime_type = mime_type;
+    return fwm;
+}
+
+void free_file_with_mime(FileWithMIME *fwm) {
+    if (fwm == NULL) return;
+    string_destroy(fwm->filepath);
+    string_destroy(fwm->mime_type);
+    free(fwm);
+}
 
 /*
 Recursively traverse / walk a directory, then the full path along the files MIME type
@@ -39,15 +73,34 @@ NOTE:
 get_file_to_index, avoids the usage of nftw FTW(3), as there are no easy ways to pass custom
 arguments to the function called by it [at least none that I know of] (we need to add things to a linked list). other than
 making the required variable global, which is a complete NO NO from me.
+
+Returns:
+    LinkedList[FileWithMIME *];
 */
-void get_files_to_index(const char *dirpath, LinkedList *list) {
+void get_files_to_index(char *dirpath, LinkedList *list) {
+    char resolved_path[PATH_MAX];
+    char *dir_full_path = get_absolute_path(dirpath, resolved_path);
+
     DIR *dir;
     struct dirent *entry;
 
-    if ((dir = opendir(dirpath)) == NULL) return;
+    if ((dir = opendir(dir_full_path)) == NULL) return;
     while ((entry = readdir(dir)) != NULL) {
-        // TODO: complete this: Good night
+        char full_file_path[PATH_MAX];
+        snprintf(full_file_path, PATH_MAX, "%s/%s", dir_full_path, entry->d_name);
+
+        if (is_dir(full_file_path)) {
+            if ((strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0)) continue;
+            get_files_to_index(full_file_path, list);
+        } else {
+            // we get a file, append the filename with its MIME type to the list
+            ll_append_left(list,
+                           create_node(create_file_with_mime(
+                               string_create_from_charp(full_file_path, strlen(full_file_path)),
+                               _get_mime_type(full_file_path))));
+        }
     }
+    closedir(dir);
 }
 
 /*

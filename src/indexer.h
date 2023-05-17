@@ -15,7 +15,10 @@ typedef struct {
     String *mime_type;
 } FileWithMIME;
 
-void get_files_to_index(const char *, LinkedList *list);
+FileWithMIME *create_file_with_mime(String *, String *);
+void free_file_with_mime(FileWithMIME *);
+
+void get_files_to_index(char *, LinkedList *list);
 
 HashTable *load_index(const char *);
 void dump_index(const char *, HashTable *);

@@ -67,6 +67,8 @@ void build_calsen() {
         }
     });
     line = cstr_array_append(line, "-ldl");
+    // might change in the future: https://github.com/Adwaith-Rajesh/calsen/issues/2
+    line = cstr_array_append(line, "-lmagic");
     Cmd cmd = {
         .line = line};
     INFO("CMD: %s", cmd_show(cmd));
