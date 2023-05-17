@@ -15,7 +15,6 @@ int is_dir(const char *pathname) {
 
     if (stat(pathname, &ps) == -1) {
         perror("stat");
-        exit(EXIT_FAILURE);
     }
     return S_ISDIR(ps.st_mode);
 }
