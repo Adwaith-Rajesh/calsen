@@ -143,10 +143,63 @@ static String *_string_expandable_append(String *str, char c) {
     return NULL;
 }
 
+static HashTable *_read_token(FILE *fp) {
+    HashTable *token_table = ht_create();
+    int ch;
+    char *tw;
+
+    // until the next ':' appears all the tokens belong the the current file
+    while ((ch = fgetc(fp)) != ':' && ch != EOF) {
+        // read the token name
+        String *token_line = string_create(20);
+        token_line = _string_expandable_append(token_line, ch);
+        while ((ch = fgetc(fp)) != '=' && ch != EOF) {
+            token_line = _string_expandable_append(token_line, ch);
+        }
+        printf("token: %s\n", token_line->str);
+
+        // read the TF val (14 bytes, after the '=')
+        char tf_val[15];
+        fgets(tf_val, 15, fp);
+
+        printf("tf val: %s\n", tf_val);
+        printf("val: %.12lf\n", strtod(tf_val, &tw));
+
+        fgetc(fp);  // ignore the newline
+    }
+    fseek(fp, -1, SEEK_CUR);  // so that next fgetc should get the ':'
+    return token_table;
+}
+
+// read the line character by character, we won't be using getline as
+// the length of a line can vary according to the size of the token parsed
+// thus we read character by character until we reach a new line or EOF
 HashTable *load_index(const char *index_file) {
-    // options
-    // 1. parse character by char
-    // 2. read an entire line, then parse
+    FILE *fp = fopen(index_file, "r");
+    String *line = string_create(30);
+    HashTable *index_table = ht_create();
+    int ch;
+
+    while ((ch = fgetc(fp)) != EOF) {
+        // move the seek after the '=' (filename begins)
+        if (ch == ':') {
+            fseek(fp, 9, SEEK_CUR);
+            // now we read the filename
+            while ((ch = fgetc(fp)) != EOF && ch != '\n') {
+                line = _string_expandable_append(line, ch);
+            }
+            printf("filename: %s\n", line->str);
+            ht_set(index_table, line->str, NULL);
+
+            // read the tokens
+            _read_token(fp);
+        }
+    }
+
+    string_destroy(line);
+    fclose(fp);
+
+    return index_table;
 }
 
 /* =============== Dump the contents to a file =============== */
