@@ -35,6 +35,7 @@ SOFTWARE.
 #include "path.h"
 #include "tf_idf.h"
 
+/*
 void node_printer(Node *node) {
     if (node == NULL) return;
     printf("tok: ");
@@ -90,7 +91,7 @@ int main(int argc, char **argv) {
     // ht_print(tf_vals, print_tf_val_ht);
     // printf("%ld : %d\n", ht_get_size(tf_vals), original_token_count);
 
-    /* =============== indexer test =============== */
+    /* =============== indexer test ===============
     HashTable *ht_filenames = ht_create();
     char full_path[512];
     ht_set(ht_filenames, get_absolute_path(argv[1], full_path), tf_vals);
@@ -106,4 +107,9 @@ int main(int argc, char **argv) {
     ht_free(parsers);
 
     return EXIT_SUCCESS;
+}
+*/
+
+int main(int argc, char **argv) {
+    return 0;
 }
