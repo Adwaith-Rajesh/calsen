@@ -162,8 +162,9 @@ static HashTable *_read_token(FILE *fp) {
         char tf_val[15];
         fgets(tf_val, 15, fp);
 
-        printf("tf val: %s\n", tf_val);
-        printf("val: %.12lf\n", strtod(tf_val, &tw));
+        double *db_val = malloc(sizeof(double));
+        *db_val = strtod(tf_val, &tw);
+        ht_set(token_table, token_line->str, db_val);
 
         fgetc(fp);  // ignore the newline
     }
@@ -192,7 +193,7 @@ HashTable *load_index(const char *index_file) {
             ht_set(index_table, line->str, NULL);
 
             // read the tokens
-            _read_token(fp);
+            ht_set(index_table, line->str, _read_token(fp));
         }
     }
 
