@@ -14,7 +14,7 @@ A search engine to search for local files based on their contents and not just t
 - [x] Calculate the TF score for each token in a file
   - Calsen uses [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) for ranking files based on the query.
 - [ ] Do the above step for all the files in a specified directory
-- [ ] Figure out a way to store the indexed data.
+- [x] Figure out a way to store the indexed data.
 - [ ] Get the query, calculate the TF-IDF score for each file, then display the top N files.
   - Parsing the query
 - [ ] Build a new UI (MayBe)
