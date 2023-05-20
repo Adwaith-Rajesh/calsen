@@ -28,6 +28,37 @@ SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 
+int verbose_flag;
+
+void print_help(int type, char *filename) {
+    char *simple_usage =
+        "Usage: %s <search/reindex> [OPTIONS]\n"
+        "--help, -h \tShow this message and quit.\n";
+
+    char *reindex_usage =
+        "Usage: %s reindex [OPTIONS]\n"
+        "--output, -o \tThe file to output the indexed data to.\n"
+        "--verbose, -v \tGet verbose output.\n"
+        "--help, -h \tShow this message and quit.\n";
+    char *search_usage =
+        "Usage: %s search [OPTIONS]\n"
+        "--index, -i \tThe file that contains the indexed data.\n"
+        "--verbose, -v \tGet verbose output.\n"
+        "--help, -h \tShow this message and quit.\n";
+
+    switch (type) {
+        case 2:
+            printf(reindex_usage, filename);
+            exit(0);
+        case 3:
+            printf(search_usage, filename);
+            exit(0);
+        default:  // this include case 1
+            printf(simple_usage, filename);
+            exit(0);
+    }
+}
+
 int main(int argc, char **argv) {
     // --dir -d  --> the dir to include during indexing
     // --verbose -v --> give info on the current state / more output
@@ -35,8 +66,15 @@ int main(int argc, char **argv) {
     // --output -o --> the output index file for the index subcommand
     // --index -i -->  the index file for the search subcommand
     // subcommand:
-    //      index
+    //      reindex
     //      search
+
+    if (argc < 2) {
+        print_help(1, argv[0]);
+    }
+
+    while (1) {
+    }
 
     return 0;
 }
