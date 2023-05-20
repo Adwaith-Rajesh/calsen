@@ -27,6 +27,9 @@ SOFTWARE.
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "cstring.h"
 
 int verbose_flag;
 
@@ -49,17 +52,19 @@ void print_help(int type, char *filename) {
     switch (type) {
         case 2:
             printf(reindex_usage, filename);
-            exit(0);
+            break;
         case 3:
             printf(search_usage, filename);
-            exit(0);
+            break;
         default:  // this include case 1
             printf(simple_usage, filename);
-            exit(0);
+            break;
     }
 }
 
 int main(int argc, char **argv) {
+    // all the options are parses first then the sub commands will be checked
+
     // --dir -d  --> the dir to include during indexing
     // --verbose -v --> give info on the current state / more output
     // --help -h --> show help and quit
@@ -68,13 +73,54 @@ int main(int argc, char **argv) {
     // subcommand:
     //      reindex
     //      search
+    int help_val = 0;
+    int c;
 
-    if (argc < 2) {
+    if (argv < 2) {
         print_help(1, argv[0]);
+        exit(0);
     }
+
+    String *output_file = NULL;
+    String *index_file = NULL;
+
+    struct option long_options[] = {
+        {"verbose", no_argument, &verbose_flag, 1},
+        {"help", no_argument, &help_val, 1},
+        {"output", required_argument, 0, 'o'},
+        {"index", required_argument, 0, 'i'},
+        {0, 0, 0, 0},
+    };
 
     while (1) {
+        int options_index = 0;
+        c = getopt_long(argc, argv, "o:i:", long_options, &options_index);
+
+        if (c == -1) break;
+
+        switch (c) {
+            case 'i':
+                printf("index with val: %s\n", optarg);
+                index_file = string_create_from_charp(optarg, strlen(optarg));
+                break;
+            case 'o':
+                printf("output with the val: %s\n", optarg);
+                output_file = string_create_from_charp(optarg, strlen(optarg));
+                break;
+        }
     }
+
+    if (strncmp("reindex", argv[1], 8) == 0) {
+        printf("reindex\n");
+        exit(0);
+    }
+
+    if (strncmp("search", argv[1], 7) == 0) {
+        exit(0);
+    }
+
+    string_destroy(output_file);
+    string_destroy(index_file);
 
     return 0;
 }
