@@ -23,93 +23,20 @@ SOFTWARE.
 
 */
 
+#include <getopt.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "cstring.h"
-#include "indexer.h"
-#include "lexer.h"
-#include "linked_list.h"
-#include "load_parser.h"
-#include "path.h"
-#include "tf_idf.h"
-
-/*
-void node_printer(Node *node) {
-    if (node == NULL) return;
-    printf("tok: ");
-    string_print((String *)node->data);
-    // printf("%p\n", node->data);
-    printf("\n");
-}
-
-void *free_string_token(Node *node, va_list list) {
-    (void)list;
-    if (node == NULL) return NULL;
-    string_destroy(node->data);
-    return node;
-}
-
-void print_tf_val_ht(void *val) {
-    if (val == NULL) return;
-    printf("%.12lf", *((double *)val));
-}
-
-// void
-
 int main(int argc, char **argv) {
-    if (argc < 2) {
-        fprintf(stderr, "Usage: ./calsen <filepath>\n");
-        exit(1);
-    }
-    const char *filepath = argv[1];
+    // --dir -d  --> the dir to include during indexing
+    // --verbose -v --> give info on the current state / more output
+    // --help -h --> show help and quit
+    // --output -o --> the output index file for the index subcommand
+    // --index -i -->  the index file for the search subcommand
+    // subcommand:
+    //      index
+    //      search
 
-    HashTable *parsers = load_all_parsers();
-
-    // ParseFileFn *fn = loa
-    char mime_type[] = "text/plain";
-    // printf("fn -> %p\n", load_parser_entry_point(parsers, mime_type));
-
-    // printf("size-> %d\n", get_file_size(filepath));
-
-    String *str = string_create(get_file_size(filepath) + 1);
-
-    load_parser_entry_point(parsers, mime_type)(filepath, str);
-    // string_print(str);
-    printf("start tokenize\n");
-    int original_token_count = 0;
-    LinkedList *tok_list = file_content_to_tokens(str->str, str->size, &original_token_count);
-    printf("got the tokens\n");
-    // ll_print(tok_list, node_printer);
-    printf("start calculating the TF\n");
-    HashTable *tf_vals = token_count(tok_list);
-    calculate_tf(tf_vals, original_token_count);
-
-    printf("calculated the TF score\n");
-
-    // ht_print(tf_vals, print_tf_val_ht);
-    // printf("%ld : %d\n", ht_get_size(tf_vals), original_token_count);
-
-    /* =============== indexer test ===============
-    HashTable *ht_filenames = ht_create();
-    char full_path[512];
-    ht_set(ht_filenames, get_absolute_path(argv[1], full_path), tf_vals);
-    dump_index("sample.index", ht_filenames);
-
-    string_destroy(str);
-    ll_map(tok_list, free_string_token);
-    ll_free(tok_list);
-    ht_free_map(parsers, unload_parser);
-    ht_free_map(tf_vals, tf_table_free_int);
-    ht_free(tf_vals);
-    ht_free(ht_filenames);
-    ht_free(parsers);
-
-    return EXIT_SUCCESS;
-}
-*/
-
-int main(int argc, char **argv) {
     return 0;
 }
