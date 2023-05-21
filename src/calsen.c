@@ -16,16 +16,36 @@
 
 extern int verbose_flag;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+
+// useful debugging function
+
 static void _node_filepath_printer(Node *node) {
     if (node == NULL) return;
     string_print(((FileWithMIME *)node->data)->filepath);
     printf("\n");
 }
 
-static void *_free_string_from_list(Node *node) {
+#pragma GCC diagnostic pop
+
+static void *_free_string_from_list(Node *node, va_list args) {
+    (void)args;
     if (node == NULL) return NULL;
     string_destroy((String *)node->data);
     return NULL;
+}
+
+static void *_free_fwm_from_list(Node *node, va_list args) {
+    (void)args;
+    if (node == NULL) return NULL;
+    free_file_with_mime((FileWithMIME *)node->data);
+    return NULL;
+}
+
+static void tf_table_in_free(void *ht) {
+    ht_free_map((HashTable *)ht, tf_table_free_int);
+    ht_free((HashTable *)ht);
 }
 
 static void *_index_one_file(Node *node, va_list args) {
@@ -44,8 +64,6 @@ static void *_index_one_file(Node *node, va_list args) {
     String *file_contents = string_create(get_file_size(fwm->filepath->str));
     parse_fn(fwm->filepath->str, file_contents);
 
-    // string_print(file_contents);
-
     // get the tokens
     int original_token_count = 0;
     LinkedList *file_tokens = file_content_to_tokens(file_contents->str,
@@ -56,6 +74,9 @@ static void *_index_one_file(Node *node, va_list args) {
 
     ht_set(tf_table, fwm->filepath->str, tf_vals);
 
+    ll_map(file_tokens, _free_string_from_list);
+    ll_free(file_tokens);
+    string_destroy(file_contents);
     return node->data;
 }
 
@@ -70,14 +91,16 @@ static void *_index_one_dir(Node *node, va_list args) {
     LinkedList *files_to_index = ll_init();
     String *dirname = (String *)node->data;
     get_files_to_index(dirname->str, files_to_index);
-    ll_print(files_to_index, _node_filepath_printer);
 
+    // index each file one by one
     ll_map(files_to_index, _index_one_file, parsers, tf_table);
 
+    ll_map(files_to_index, _free_fwm_from_list);
+    ll_free(files_to_index);
     return node->data;
 }
 
-void calsen_index_files(LinkedList *dir_list) {
+void calsen_index_files(LinkedList *dir_list, const char *output_file) {
     HashTable *file_tf_table = ht_create();
 
     HashTable *parsers = load_all_parsers();
@@ -85,7 +108,10 @@ void calsen_index_files(LinkedList *dir_list) {
     ht_set(parsers, "text_x-c.so", ht_get(parsers, "text_plain.so"));
 
     ll_map(dir_list, _index_one_dir, parsers, file_tf_table);
-    ht_free_map(parsers, unload_parser);
 
-    dump_index("sample.index", file_tf_table);
+    dump_index(output_file, file_tf_table);
+    ht_free_map(parsers, unload_parser);
+    ht_free(parsers);
+    ht_free_map(file_tf_table, tf_table_in_free);
+    ht_free(file_tf_table);
 }

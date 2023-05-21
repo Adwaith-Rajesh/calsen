@@ -3,6 +3,6 @@
 
 #include "linked_list.h"
 
-void calsen_index_files(LinkedList *);
+void calsen_index_files(LinkedList *, const char *);
 
 #endif
