@@ -23,87 +23,162 @@ SOFTWARE.
 
 */
 
+#include <getopt.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "cstring.h"
-#include "indexer.h"
-#include "lexer.h"
 #include "linked_list.h"
-#include "load_parser.h"
-#include "path.h"
-#include "tf_idf.h"
 
-void node_printer(Node *node) {
+int verbose_flag;
+
+static LinkedList *_ll_check_null_add(LinkedList *list, char *dirname) {
+    // we kind of have to own dirname, do it's better to convert it to a String *
+    if (list == NULL) {
+        list = ll_init();
+    }
+    ll_append_left(list, create_node(
+                             string_create_from_charp(dirname, strlen(dirname))));
+    return list;
+}
+
+static void _node_string_printer(Node *node) {
     if (node == NULL) return;
-    printf("tok: ");
     string_print((String *)node->data);
-    // printf("%p\n", node->data);
     printf("\n");
 }
 
-void *free_string_token(Node *node, va_list list) {
-    (void)list;
+static void *_ll_string_destroy(Node *node, va_list args) {
+    (void)args;
     if (node == NULL) return NULL;
-    string_destroy(node->data);
-    return node;
-}
+    string_destroy((String *)node->data);
 
-void print_tf_val_ht(void *val) {
-    if (val == NULL) return;
-    printf("%.12lf", *((double *)val));
+    return NULL;
 }
+void print_help(FILE *stream, int type, char *filename) {
+    char *simple_usage =
+        "Usage: %s <search/reindex> [OPTIONS]\n"
+        "--help, -h \tShow this message and quit.\n";
 
-// void
+    char *reindex_usage =
+        "Usage: %s reindex [OPTIONS]\n"
+        "--output, -o \tThe file to output the indexed data to.\n"
+        "--verbose, -v \tGet verbose output.\n"
+        "--dir, -d \tThe directories to find the files to index.\n"
+        "--help, -h \tShow this message and quit.\n";
+    char *search_usage =
+        "Usage: %s search [OPTIONS]\n"
+        "--index, -i \tThe file that contains the indexed data.\n"
+        "--query, -q \tThe query to search.\n"
+        "--verbose, -v \tGet verbose output.\n"
+        "--help, -h \tShow this message and quit.\n";
+
+    switch (type) {
+        case 2:
+            fprintf(stream, reindex_usage, filename);
+            break;
+        case 3:
+            fprintf(stream, search_usage, filename);
+            break;
+        default:  // this include case 1
+            fprintf(stream, simple_usage, filename);
+            break;
+    }
+}
 
 int main(int argc, char **argv) {
+    // all the options are parses first then the sub commands will be checked
+
+    // --dir -d  --> the dir to include during indexing
+    // --verbose -v --> give info on the current state / more output
+    // --help -h --> show help and quit
+    // --output -o --> the output index file for the index subcommand
+    // --index -i -->  the index file for the search subcommand
+    // --query, -q -> The query to search for
+    // subcommand:
+    //      reindex
+    //      search
+    int help_val = 0;
+    int c;
+
+    String *output_file = NULL;
+    String *index_file = NULL;
+    String *argv_1_val = NULL;
+    String *query = NULL;
+    LinkedList *dir_list = NULL;
+
+    struct option long_options[] = {
+        {"verbose", no_argument, &verbose_flag, 1},
+        {"help", no_argument, &help_val, 1},
+        {"output", required_argument, 0, 'o'},
+        {"index", required_argument, 0, 'i'},
+        {"dir", required_argument, 0, 'd'},
+        {"query", required_argument, 0, 'q'},
+        {0, 0, 0, 0},
+    };
+
+    if (argc >= 2) {
+        argv_1_val = string_create_from_charp(argv[1], strlen(argv[1]));
+        // for some reason the code below seems to change the order
+    }
+
+    while (1) {
+        int options_index = 0;
+        c = getopt_long(argc, argv, "o:i:d:q:", long_options, &options_index);
+
+        if (c == -1) break;
+
+        switch (c) {
+            case 'i':
+                index_file = string_create_from_charp(optarg, strlen(optarg));
+                break;
+            case 'o':
+                output_file = string_create_from_charp(optarg, strlen(optarg));
+                break;
+            case 'd':
+                dir_list = _ll_check_null_add(dir_list, optarg);
+                break;
+            case 'q':
+                query = string_create_from_charp(optarg, strlen(optarg));
+                break;
+        }
+    }
+
+    if (argc <= 2 && help_val) {
+        print_help(stdout, 1, argv[0]);
+        exit(0);
+    }
+
     if (argc < 2) {
-        fprintf(stderr, "Usage: ./calsen <filepath>\n");
+        print_help(stderr, 1, argv[0]);
         exit(1);
     }
-    const char *filepath = argv[1];
 
-    HashTable *parsers = load_all_parsers();
+    if (strcmp("reindex", argv_1_val->str) == 0) {
+        if ((dir_list == NULL) || (output_file == NULL)) {
+            fprintf(stderr, "reindex: missing one of --dir, --output\n");
+            print_help(stderr, 2, argv[0]);
+            exit(1);
+        }
+    }
 
-    // ParseFileFn *fn = loa
-    char mime_type[] = "text/plain";
-    // printf("fn -> %p\n", load_parser_entry_point(parsers, mime_type));
+    if (strcmp("search", argv_1_val->str) == 0) {
+        if ((query == NULL) || (index_file == NULL)) {
+            fprintf(stderr, "search: missing one of --query, --index\n");
+            print_help(stderr, 3, argv[0]);
+            exit(1);
+        }
+    }
 
-    // printf("size-> %d\n", get_file_size(filepath));
+    if (dir_list != NULL) {
+        ll_print(dir_list, _node_string_printer);
+        ll_map(dir_list, _ll_string_destroy);
+    }
+    string_destroy(output_file);
+    string_destroy(index_file);
+    string_destroy(argv_1_val);
 
-    String *str = string_create(get_file_size(filepath) + 1);
-
-    load_parser_entry_point(parsers, mime_type)(filepath, str);
-    // string_print(str);
-    printf("start tokenize\n");
-    int original_token_count = 0;
-    LinkedList *tok_list = file_content_to_tokens(str->str, str->size, &original_token_count);
-    printf("got the tokens\n");
-    // ll_print(tok_list, node_printer);
-    printf("start calculating the TF\n");
-    HashTable *tf_vals = token_count(tok_list);
-    calculate_tf(tf_vals, original_token_count);
-
-    printf("calculated the TF score\n");
-
-    // ht_print(tf_vals, print_tf_val_ht);
-    // printf("%ld : %d\n", ht_get_size(tf_vals), original_token_count);
-
-    /* =============== indexer test =============== */
-    HashTable *ht_filenames = ht_create();
-    char full_path[512];
-    ht_set(ht_filenames, get_absolute_path(argv[1], full_path), tf_vals);
-    dump_index("sample.index", ht_filenames);
-
-    string_destroy(str);
-    ll_map(tok_list, free_string_token);
-    ll_free(tok_list);
-    ht_free_map(parsers, unload_parser);
-    ht_free_map(tf_vals, tf_table_free_int);
-    ht_free(tf_vals);
-    ht_free(ht_filenames);
-    ht_free(parsers);
-
-    return EXIT_SUCCESS;
+    return 0;
 }
