@@ -29,6 +29,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
+#include "calsen.h"
 #include "cstring.h"
 #include "linked_list.h"
 
@@ -162,6 +163,10 @@ int main(int argc, char **argv) {
             print_help(stderr, 2, argv[0]);
             exit(1);
         }
+        printf("dirs: ");
+        ll_print(dir_list, _node_string_printer);
+        printf("\n");
+        calsen_index_files(dir_list);
     }
 
     if (strcmp("search", argv_1_val->str) == 0) {
@@ -172,10 +177,10 @@ int main(int argc, char **argv) {
         }
     }
 
-    if (dir_list != NULL) {
-        ll_print(dir_list, _node_string_printer);
-        ll_map(dir_list, _ll_string_destroy);
-    }
+    // if (dir_list != NULL) {
+    //     ll_print(dir_list, _node_string_printer);
+    //     ll_map(dir_list, _ll_string_destroy);
+    // }
     string_destroy(output_file);
     string_destroy(index_file);
     string_destroy(argv_1_val);
