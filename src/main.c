@@ -30,8 +30,33 @@ SOFTWARE.
 #include <string.h>
 
 #include "cstring.h"
+#include "linked_list.h"
 
 int verbose_flag;
+
+static LinkedList *_ll_check_null_add(LinkedList *list, char *dirname) {
+    // we kind of have to own dirname, do it's better to convert it to a String *
+    if (list == NULL) {
+        list = ll_init();
+    }
+    ll_append_left(list, create_node(
+                             string_create_from_charp(dirname, strlen(dirname))));
+    return list;
+}
+
+static void _node_string_printer(Node *node) {
+    if (node == NULL) return;
+    string_print((String *)node->data);
+    printf("\n");
+}
+
+static void *_ll_string_destroy(Node *node, va_list args) {
+    (void)args;
+    if (node == NULL) return NULL;
+    string_destroy((String *)node->data);
+
+    return NULL;
+}
 
 void print_help(int type, char *filename) {
     char *simple_usage =
@@ -42,6 +67,7 @@ void print_help(int type, char *filename) {
         "Usage: %s reindex [OPTIONS]\n"
         "--output, -o \tThe file to output the indexed data to.\n"
         "--verbose, -v \tGet verbose output.\n"
+        "--dir, -d \tThe directories to find the files to index.\n"
         "--help, -h \tShow this message and quit.\n";
     char *search_usage =
         "Usage: %s search [OPTIONS]\n"
@@ -76,36 +102,39 @@ int main(int argc, char **argv) {
     int help_val = 0;
     int c;
 
-    if (argv < 2) {
+    if (argc < 2) {
         print_help(1, argv[0]);
         exit(0);
     }
 
     String *output_file = NULL;
     String *index_file = NULL;
+    LinkedList *dir_list = NULL;
 
     struct option long_options[] = {
         {"verbose", no_argument, &verbose_flag, 1},
         {"help", no_argument, &help_val, 1},
         {"output", required_argument, 0, 'o'},
         {"index", required_argument, 0, 'i'},
+        {"dir", required_argument, 0, 'd'},
         {0, 0, 0, 0},
     };
 
     while (1) {
         int options_index = 0;
-        c = getopt_long(argc, argv, "o:i:", long_options, &options_index);
+        c = getopt_long(argc, argv, "o:i:d:", long_options, &options_index);
 
         if (c == -1) break;
 
         switch (c) {
             case 'i':
-                printf("index with val: %s\n", optarg);
                 index_file = string_create_from_charp(optarg, strlen(optarg));
                 break;
             case 'o':
-                printf("output with the val: %s\n", optarg);
                 output_file = string_create_from_charp(optarg, strlen(optarg));
+                break;
+            case 'd':
+                dir_list = _ll_check_null_add(dir_list, optarg);
                 break;
         }
     }
@@ -118,6 +147,9 @@ int main(int argc, char **argv) {
     if (strncmp("search", argv[1], 7) == 0) {
         exit(0);
     }
+
+    ll_print(dir_list, _node_string_printer);
+    ll_map(dir_list, _ll_string_destroy);
 
     string_destroy(output_file);
     string_destroy(index_file);
