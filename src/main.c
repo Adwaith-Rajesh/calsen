@@ -57,8 +57,7 @@ static void *_ll_string_destroy(Node *node, va_list args) {
 
     return NULL;
 }
-
-void print_help(int type, char *filename) {
+void print_help(FILE *stream, int type, char *filename) {
     char *simple_usage =
         "Usage: %s <search/reindex> [OPTIONS]\n"
         "--help, -h \tShow this message and quit.\n";
@@ -72,18 +71,19 @@ void print_help(int type, char *filename) {
     char *search_usage =
         "Usage: %s search [OPTIONS]\n"
         "--index, -i \tThe file that contains the indexed data.\n"
+        "--query, -q \tThe query to search.\n"
         "--verbose, -v \tGet verbose output.\n"
         "--help, -h \tShow this message and quit.\n";
 
     switch (type) {
         case 2:
-            printf(reindex_usage, filename);
+            fprintf(stream, reindex_usage, filename);
             break;
         case 3:
-            printf(search_usage, filename);
+            fprintf(stream, search_usage, filename);
             break;
         default:  // this include case 1
-            printf(simple_usage, filename);
+            fprintf(stream, simple_usage, filename);
             break;
     }
 }
@@ -96,19 +96,17 @@ int main(int argc, char **argv) {
     // --help -h --> show help and quit
     // --output -o --> the output index file for the index subcommand
     // --index -i -->  the index file for the search subcommand
+    // --query, -q -> The query to search for
     // subcommand:
     //      reindex
     //      search
     int help_val = 0;
     int c;
 
-    if (argc < 2) {
-        print_help(1, argv[0]);
-        exit(0);
-    }
-
     String *output_file = NULL;
     String *index_file = NULL;
+    String *argv_1_val = NULL;
+    String *query = NULL;
     LinkedList *dir_list = NULL;
 
     struct option long_options[] = {
@@ -117,12 +115,18 @@ int main(int argc, char **argv) {
         {"output", required_argument, 0, 'o'},
         {"index", required_argument, 0, 'i'},
         {"dir", required_argument, 0, 'd'},
+        {"query", required_argument, 0, 'q'},
         {0, 0, 0, 0},
     };
 
+    if (argc >= 2) {
+        argv_1_val = string_create_from_charp(argv[1], strlen(argv[1]));
+        // for some reason the code below seems to change the order
+    }
+
     while (1) {
         int options_index = 0;
-        c = getopt_long(argc, argv, "o:i:d:", long_options, &options_index);
+        c = getopt_long(argc, argv, "o:i:d:q:", long_options, &options_index);
 
         if (c == -1) break;
 
@@ -136,23 +140,45 @@ int main(int argc, char **argv) {
             case 'd':
                 dir_list = _ll_check_null_add(dir_list, optarg);
                 break;
+            case 'q':
+                query = string_create_from_charp(optarg, strlen(optarg));
+                break;
         }
     }
 
-    if (strncmp("reindex", argv[1], 8) == 0) {
-        printf("reindex\n");
+    if (argc <= 2 && help_val) {
+        print_help(stdout, 1, argv[0]);
         exit(0);
     }
 
-    if (strncmp("search", argv[1], 7) == 0) {
-        exit(0);
+    if (argc < 2) {
+        print_help(stderr, 1, argv[0]);
+        exit(1);
     }
 
-    ll_print(dir_list, _node_string_printer);
-    ll_map(dir_list, _ll_string_destroy);
+    if (strcmp("reindex", argv_1_val->str) == 0) {
+        if ((dir_list == NULL) || (output_file == NULL)) {
+            fprintf(stderr, "reindex: missing one of --dir, --output\n");
+            print_help(stderr, 2, argv[0]);
+            exit(1);
+        }
+    }
 
+    if (strcmp("search", argv_1_val->str) == 0) {
+        if ((query == NULL) || (index_file == NULL)) {
+            fprintf(stderr, "search: missing one of --query, --index\n");
+            print_help(stderr, 3, argv[0]);
+            exit(1);
+        }
+    }
+
+    if (dir_list != NULL) {
+        ll_print(dir_list, _node_string_printer);
+        ll_map(dir_list, _ll_string_destroy);
+    }
     string_destroy(output_file);
     string_destroy(index_file);
+    string_destroy(argv_1_val);
 
     return 0;
 }
