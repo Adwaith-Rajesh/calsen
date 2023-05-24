@@ -115,3 +115,16 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
     ht_free_map(file_tf_table, tf_table_in_free);
     ht_free(file_tf_table);
 }
+
+LinkedList *search(const char *query, const char *index_file) {
+    // load the indexed data
+    HashTable *index = load_index(index_file);
+
+    // parse the query
+    // we are just gonna use the same function that tokenize the file content to
+    // tokenize the query.
+    int tw_var = 0;
+    LinkedList *query_tokens = file_content_to_tokens(query, strlen(query), &tw_var);
+
+    // do IDF
+}

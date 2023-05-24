@@ -82,3 +82,10 @@ void tf_table_free_int(void *int_val) {
     if (int_val == NULL) return;
     free(int_val);
 }
+
+// index_table -> the entire index
+double calculate_idf(HashTable *index_table, String *token) {
+    size_t n_docs = ht_get_size(index_table);
+
+    // count the number of files the token exist
+}
