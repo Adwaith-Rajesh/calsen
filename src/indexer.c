@@ -156,7 +156,6 @@ static HashTable *_read_token(FILE *fp) {
         while ((ch = fgetc(fp)) != '=' && ch != EOF) {
             token_line = _string_expandable_append(token_line, ch);
         }
-        printf("token: %s\n", token_line->str);
 
         // read the TF val (14 bytes, after the '=')
         char tf_val[15];
@@ -189,7 +188,6 @@ HashTable *load_index(const char *index_file) {
             while ((ch = fgetc(fp)) != EOF && ch != '\n') {
                 line = _string_expandable_append(line, ch);
             }
-            printf("filename: %s\n", line->str);
             ht_set(index_table, line->str, NULL);
 
             // read the tokens
