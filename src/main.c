@@ -181,6 +181,8 @@ int main(int argc, char **argv) {
             print_help(stderr, 3, argv[0]);
             exit(1);
         }
+
+        search(query->str, index_file->str);
     }
 
     string_destroy(output_file);
