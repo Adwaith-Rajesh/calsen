@@ -1,7 +1,10 @@
 #include "tf_idf.h"
 
+#include <math.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "cstring.h"
 #include "hash_table.h"
@@ -83,9 +86,38 @@ void tf_table_free_int(void *int_val) {
     free(int_val);
 }
 
+// =========== IDF stuff ===========
+
+static void _tf_table_iter_inner(HTEntry *entry, va_list args) {
+    va_list args_copy;
+    va_copy(args_copy, args);
+
+    int *t_count = va_arg(args_copy, int *);
+    String *token = va_arg(args_copy, String *);
+
+    if (strcmp(entry->key, token->str) == 0) *t_count = *t_count + 1;
+}
+
+static void _tf_table_iter(HTEntry *entry, va_list args) {
+    va_list args_copy;
+    va_copy(args_copy, args);
+
+    int *t_count = va_arg(args_copy, int *);
+    String *token = va_arg(args_copy, String *);
+
+    ht_entry_map(entry->value, _tf_table_iter_inner, t_count, token);
+}
+
 // index_table -> the entire index
 double calculate_idf(HashTable *index_table, String *token) {
     size_t n_docs = ht_get_size(index_table);
 
-    // count the number of files the token exist
+    // count the number of files the token exist in
+    int t_count = 0;
+    ht_entry_map(index_table, _tf_table_iter, &t_count, token);
+
+    printf("docs count: %ld\n", n_docs);
+    printf("token count: %d\n", t_count);
+
+    return log10((size_t)t_count / t_count);
 }

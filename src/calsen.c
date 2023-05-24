@@ -116,6 +116,16 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
     ht_free(file_tf_table);
 }
 
+static void *_idf_token_map(Node *node, va_list args) {
+    va_list args_copy;
+    va_copy(args_copy, args);
+
+    HashTable *index_table = va_arg(args_copy, HashTable *);
+    calculate_idf(index_table, (String *)node->data);
+
+    return node->data;
+}
+
 LinkedList *search(const char *query, const char *index_file) {
     // load the indexed data
     HashTable *index = load_index(index_file);
@@ -125,6 +135,10 @@ LinkedList *search(const char *query, const char *index_file) {
     // tokenize the query.
     int tw_var = 0;
     LinkedList *query_tokens = file_content_to_tokens(query, strlen(query), &tw_var);
+
+    ll_map(query_tokens, _idf_token_map, index);
+
+    ll_map(query_tokens, _free_string_from_list);
 
     // do IDF
 }
