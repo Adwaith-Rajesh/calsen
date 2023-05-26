@@ -121,10 +121,10 @@ If the next field is modified, unexpected behavior can occur
 */
 void ht_entry_map(HashTable *table, HtEntryMapFn *fn, ...) {
     va_list args;
-    va_start(args, fn);
     for (int i = 0; i < HASH_TABLE_SIZE; i++) {
         HTEntry *entry = table->entries[i];
         while (entry != NULL) {
+            va_start(args, fn);
             fn(entry, args);
             entry = entry->next;
         }
