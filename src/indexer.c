@@ -210,11 +210,9 @@ static inline void _dump_line(FILE *fp, char *line, size_t size) {
 static void _dump_index_d_as_val(HTEntry *entry, va_list args) {
     // takes care of writing the individual tokens to the indexer file
     if (entry == NULL) return;
-    va_list args_copy;
-    va_copy(args_copy, args);
 
-    FILE *fp = va_arg(args_copy, FILE *);
-    String *line = va_arg(args_copy, String *);
+    FILE *fp = va_arg(args, FILE *);
+    String *line = va_arg(args, String *);
 
     string_append_charp(line, entry->key);
     string_append_char(line, '=');
@@ -228,10 +226,8 @@ static void _dump_index_map_ht_as_val(HTEntry *entry, va_list args) {
 
     if (entry == NULL) return;
     // the max size fo a filepath in linux is PATH_MAX(4096) +
-    va_list args_copy;
-    va_copy(args_copy, args);
 
-    FILE *fp = va_arg(args_copy, FILE *);
+    FILE *fp = va_arg(args, FILE *);
     String *line = string_create(PATH_MAX);
 
     string_append_charp(line, ":filename=");

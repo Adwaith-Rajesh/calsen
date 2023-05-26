@@ -23,9 +23,7 @@ there, was, a, fox, that, could, not, jump, ., Ha, Ha, 1, :, 23
 This function is as function to map overt the token list
 */
 static void *_to_lowercase(Node *node, va_list arg_list) {
-    va_list args_copy;
-    va_copy(args_copy, arg_list);
-    (*(va_arg(args_copy, int *)))++;  // inc the total count
+    (*(va_arg(arg_list, int *)))++;  // inc the total count
     if (node == NULL) return NULL;
     String *str = (String *)(node->data);
     int i = 0;

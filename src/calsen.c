@@ -82,11 +82,8 @@ static void *_index_one_file(Node *node, va_list args) {
 }
 
 static void *_index_one_dir(Node *node, va_list args) {
-    va_list args_copy;
-    va_copy(args_copy, args);
-
-    HashTable *parsers = va_arg(args_copy, HashTable *);
-    HashTable *tf_table = va_arg(args_copy, HashTable *);
+    HashTable *parsers = va_arg(args, HashTable *);
+    HashTable *tf_table = va_arg(args, HashTable *);
 
     // get all the file to index along with their MIME type
     LinkedList *files_to_index = ll_init();
@@ -118,11 +115,8 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
 }
 
 static void *_idf_token_map(Node *node, va_list args) {
-    va_list args_copy;
-    va_copy(args_copy, args);
-
-    HashTable *index_table = va_arg(args_copy, HashTable *);
-    LinkedList *token_idf_list = va_arg(args_copy, HashTable *);
+    HashTable *index_table = va_arg(args, HashTable *);
+    LinkedList *token_idf_list = va_arg(args, HashTable *);
 
     double idf_val = calculate_idf(index_table, (String *)node->data);
 

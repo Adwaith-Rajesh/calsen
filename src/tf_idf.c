@@ -65,9 +65,7 @@ HashTable *token_count(LinkedList *token_list) {
 }
 
 static void _calculate_tf_value_for_entry(HTEntry *entry, va_list args) {
-    va_list args_copy;
-    va_copy(args_copy, args);
-    size_t table_size = va_arg(args_copy, size_t);
+    size_t table_size = va_arg(args, size_t);
 
     int token_count = *((int *)(entry->value));
     free(entry->value);  // free the existing int value
@@ -89,21 +87,15 @@ void tf_table_free_int(void *int_val) {
 // =========== IDF stuff ===========
 
 static void _tf_table_iter_inner(HTEntry *entry, va_list args) {
-    va_list args_copy;
-    va_copy(args_copy, args);
-
-    int *t_count = va_arg(args_copy, int *);
-    String *token = va_arg(args_copy, String *);
+    int *t_count = va_arg(args, int *);
+    String *token = va_arg(args, String *);
 
     if (strcmp(entry->key, token->str) == 0) *t_count = *t_count + 1;
 }
 
 static void _tf_table_iter(HTEntry *entry, va_list args) {
-    va_list args_copy;
-    va_copy(args_copy, args);
-
-    int *t_count = va_arg(args_copy, int *);
-    String *token = va_arg(args_copy, String *);
+    int *t_count = va_arg(args, int *);
+    String *token = va_arg(args, String *);
 
     ht_entry_map(entry->value, _tf_table_iter_inner, t_count, token);
 }
