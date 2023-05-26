@@ -113,3 +113,32 @@ double calculate_idf(HashTable *index_table, String *token) {
 
     return log10((size_t)t_count / t_count);
 }
+
+// =========== Storing the values  ===========
+
+TokenIDFVal *create_token_idf_val(String *token, double idf_val) {
+    TokenIDFVal *new_t_idf_val = malloc(sizeof(TokenIDFVal));
+    new_t_idf_val->token = token;
+    new_t_idf_val->idf_val = idf_val;
+    return new_t_idf_val;
+}
+
+FileTFIDFVal *create_file_tf_idf_val(String *filename, double tf_idf_val) {
+    FileTFIDFVal *new_ft_idf_val = malloc(sizeof(FileTFIDFVal));
+    new_ft_idf_val->filename = string_create_from_charp(filename->str, filename->size);
+    new_ft_idf_val->tf_idf_val = tf_idf_val;
+    return new_ft_idf_val;
+}
+
+void free_token_idf_val(TokenIDFVal *t_idf_val) {
+    if (t_idf_val == NULL) return;
+    free(t_idf_val);
+}
+
+void free_file_tf_idf_val(FileTFIDFVal *ft_idf_val) {
+    if (ft_idf_val == NULL) return;
+
+    // FileTFIDFval owns the filename String *
+    string_destroy(ft_idf_val->filename);
+    free(ft_idf_val);
+}
