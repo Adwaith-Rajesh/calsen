@@ -111,7 +111,7 @@ double calculate_idf(HashTable *index_table, String *token) {
     // printf("docs count: %ld\n", n_docs);
     // printf("token count: %d\n", t_count);
 
-    return log10(n_docs / ((size_t)(1 + t_count)));
+    return log10(((double)n_docs / ((double)(1 + t_count))));
 }
 
 // =========== Storing the values  ===========
@@ -171,11 +171,13 @@ static void _tf_idf_file_map(HTEntry *entry, va_list args) {
     for (; token != NULL; token = token->next) {
         double *token_tf_val = ht_get(tf_file_index, _node_to_tidf_val(token)->token->str);
         if (token_tf_val != NULL) {
+            // printf("token TF val: %lf\n", *token_tf_val);
+            // printf("token IDF val: %lf\n", _node_to_tidf_val(token)->idf_val);
             file_tf_idf_val += ((*token_tf_val) * _node_to_tidf_val(token)->idf_val);
         }
     }
 
-    printf("TF_IDF val = %lf\n", file_tf_idf_val);
+    printf("TF_IDF val = %.12lf\n", file_tf_idf_val);
 }
 
 LinkedList *calculate_tf_idf(HashTable *tf_index, LinkedList *token_idf_list) {

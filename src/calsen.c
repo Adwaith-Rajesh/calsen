@@ -116,7 +116,7 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
 
 static void *_idf_token_map(Node *node, va_list args) {
     HashTable *index_table = va_arg(args, HashTable *);
-    LinkedList *token_idf_list = va_arg(args, HashTable *);
+    LinkedList *token_idf_list = va_arg(args, LinkedList *);
 
     double idf_val = calculate_idf(index_table, (String *)node->data);
     ll_append_left(token_idf_list,
