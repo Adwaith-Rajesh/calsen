@@ -192,6 +192,7 @@ HashTable *load_index(const char *index_file) {
 
             // read the tokens
             ht_set(index_table, line->str, _read_token(fp));
+            string_reset(line);
         }
     }
 
