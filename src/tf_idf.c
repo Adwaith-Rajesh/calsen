@@ -116,8 +116,8 @@ double calculate_idf(HashTable *index_table, String *token) {
     int t_count = 0;
     ht_entry_map(index_table, _tf_table_iter, &t_count, token);
 
-    printf("docs count: %ld\n", n_docs);
-    printf("token count: %d\n", t_count);
+    // printf("docs count: %ld\n", n_docs);
+    // printf("token count: %d\n", t_count);
 
     return log10((size_t)t_count / t_count);
 }

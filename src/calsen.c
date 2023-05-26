@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "cstring.h"
 #include "hash_table.h"
@@ -121,7 +122,9 @@ static void *_idf_token_map(Node *node, va_list args) {
     va_copy(args_copy, args);
 
     HashTable *index_table = va_arg(args_copy, HashTable *);
-    calculate_idf(index_table, (String *)node->data);
+    LinkedList *token_idf_list = va_arg(args_copy, HashTable *);
+
+    double idf_val = calculate_idf(index_table, (String *)node->data);
 
     return node->data;
 }
@@ -130,15 +133,21 @@ LinkedList *search(const char *query, const char *index_file) {
     // load the indexed data
     HashTable *index = load_index(index_file);
 
+    // list to store all the tokens along with its idf vals
+    LinkedList *toke_idf_list = ll_init();
+
     // parse the query
     // we are just gonna use the same function that tokenize the file content to
     // tokenize the query.
     int tw_var = 0;
-    LinkedList *query_tokens = file_content_to_tokens(query, strlen(query), &tw_var);
+    LinkedList *query_tokens = file_content_to_tokens((char *)query, strlen(query), &tw_var);
 
+    // gets the number of files the token appeared in the corpus
     ll_map(query_tokens, _idf_token_map, index);
 
-    ll_map(query_tokens, _free_string_from_list);
-
     // do IDF
+
+    ll_map(query_tokens, _free_string_from_list);
+    ll_free(query_tokens);
+    // free the loaded index
 }
