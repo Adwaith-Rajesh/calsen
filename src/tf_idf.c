@@ -111,7 +111,7 @@ double calculate_idf(HashTable *index_table, String *token) {
     // printf("docs count: %ld\n", n_docs);
     // printf("token count: %d\n", t_count);
 
-    return log10((size_t)t_count / t_count);
+    return log10(n_docs / ((size_t)(1 + t_count)));
 }
 
 // =========== Storing the values  ===========
@@ -141,4 +141,47 @@ void free_file_tf_idf_val(FileTFIDFVal *ft_idf_val) {
     // FileTFIDFval owns the filename String *
     string_destroy(ft_idf_val->filename);
     free(ft_idf_val);
+}
+
+// =========== TF-IDF  ===========
+
+// pick a file from the index, then for each token in the token_idf_list
+// do the following
+// file_tf_idf += tf_val_token * idf_val_token
+
+static inline TokenIDFVal *_node_to_tidf_val(Node *node) {
+    return (TokenIDFVal *)node->data;
+}
+
+static void _tf_idf_file_map(HTEntry *entry, va_list args) {
+    if (entry == NULL) return;  // just in case
+
+    LinkedList *token_idf_list = va_arg(args, LinkedList *);
+    LinkedList *file_tf_idf_list = va_arg(args, LinkedList *);
+
+    double file_tf_idf_val = 0.0;
+
+    // tf_index of one file
+    HashTable *tf_file_index = (HashTable *)entry->value;
+
+    printf("filename: %s\n", entry->key);
+
+    // each node holds TokenIDFVal *
+    Node *token = token_idf_list->head;
+    for (; token != NULL; token = token->next) {
+        double *token_tf_val = ht_get(tf_file_index, _node_to_tidf_val(token)->token->str);
+        if (token_tf_val != NULL) {
+            file_tf_idf_val += ((*token_tf_val) * _node_to_tidf_val(token)->idf_val);
+        }
+    }
+
+    printf("TF_IDF val = %lf\n", file_tf_idf_val);
+}
+
+LinkedList *calculate_tf_idf(HashTable *tf_index, LinkedList *token_idf_list) {
+    LinkedList *file_tf_idf_list = ll_init();
+
+    ht_entry_map(tf_index, _tf_idf_file_map, token_idf_list, file_tf_idf_list);
+
+    return file_tf_idf_list;
 }

@@ -44,7 +44,7 @@ static void *_free_fwm_from_list(Node *node, va_list args) {
     return NULL;
 }
 
-static void tf_table_in_free(void *ht) {
+static void _tf_table_in_free(void *ht) {
     ht_free_map((HashTable *)ht, tf_table_free_int);
     ht_free((HashTable *)ht);
 }
@@ -110,7 +110,7 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
     dump_index(output_file, file_tf_table);
     ht_free_map(parsers, unload_parser);
     ht_free(parsers);
-    ht_free_map(file_tf_table, tf_table_in_free);
+    ht_free_map(file_tf_table, _tf_table_in_free);
     ht_free(file_tf_table);
 }
 
@@ -119,6 +119,8 @@ static void *_idf_token_map(Node *node, va_list args) {
     LinkedList *token_idf_list = va_arg(args, HashTable *);
 
     double idf_val = calculate_idf(index_table, (String *)node->data);
+    ll_append_left(token_idf_list,
+                   create_node(create_token_idf_val((String *)node->data, idf_val)));
 
     return node->data;
 }
@@ -128,7 +130,7 @@ LinkedList *search(const char *query, const char *index_file) {
     HashTable *index = load_index(index_file);
 
     // list to store all the tokens along with its idf vals
-    LinkedList *toke_idf_list = ll_init();
+    LinkedList *token_idf_list = ll_init();
 
     // parse the query
     // we are just gonna use the same function that tokenize the file content to
@@ -137,11 +139,13 @@ LinkedList *search(const char *query, const char *index_file) {
     LinkedList *query_tokens = file_content_to_tokens((char *)query, strlen(query), &tw_var);
 
     // gets the number of files the token appeared in the corpus
-    ll_map(query_tokens, _idf_token_map, index);
+    ll_map(query_tokens, _idf_token_map, index, token_idf_list);
 
     // do IDF
+    calculate_tf_idf(index, token_idf_list);
 
     ll_map(query_tokens, _free_string_from_list);
     ll_free(query_tokens);
     // free the loaded index
+    // free the token_idf_list
 }

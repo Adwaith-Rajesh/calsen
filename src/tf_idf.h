@@ -26,5 +26,6 @@ TokenIDFVal *create_token_idf_val(String *, double);
 FileTFIDFVal *create_file_tf_idf_val(String *, double);
 void free_token_idf_val(TokenIDFVal *);
 void free_file_tf_idf_val(FileTFIDFVal *);
+LinkedList *calculate_tf_idf(HashTable *, LinkedList *);
 
 #endif
