@@ -166,6 +166,7 @@ static HashTable *_read_token(FILE *fp) {
         ht_set(token_table, token_line->str, db_val);
 
         fgetc(fp);  // ignore the newline
+        string_destroy(token_line);
     }
     fseek(fp, -1, SEEK_CUR);  // so that next fgetc should get the ':'
     return token_table;
