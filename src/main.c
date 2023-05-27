@@ -69,6 +69,9 @@ static void *_ll_string_destroy(Node *node, va_list args) {
 
 static void _ll_print_file_tf_idf_map(Node *node) {
     if (node == NULL) return;
+
+    if (verbose_flag)
+        printf("%.12lf : ", ((FileTFIDFVal *)node->data)->tf_idf_val);
     string_print((String *)((FileTFIDFVal *)node->data)->filename);
     printf("\n");
 }
