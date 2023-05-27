@@ -23,7 +23,7 @@ void tf_table_free_int(void *);
 double calculate_idf(HashTable *, String *);
 
 TokenIDFVal *create_token_idf_val(String *, double);
-FileTFIDFVal *create_file_tf_idf_val(String *, double);
+FileTFIDFVal *create_file_tf_idf_val(const char *, double);
 void free_token_idf_val(TokenIDFVal *);
 void free_file_tf_idf_val(FileTFIDFVal *);
 LinkedList *calculate_tf_idf(HashTable *, LinkedList *);

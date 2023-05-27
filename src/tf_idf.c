@@ -111,7 +111,11 @@ double calculate_idf(HashTable *index_table, String *token) {
     // printf("docs count: %ld\n", n_docs);
     // printf("token count: %d\n", t_count);
 
-    return log10(((double)n_docs / ((double)(1 + t_count))));
+    if (t_count != 0)
+        return log10(((double)n_docs / ((double)(t_count))));
+    else {
+        return 0.0;
+    }
 }
 
 // =========== Storing the values  ===========
@@ -123,9 +127,9 @@ TokenIDFVal *create_token_idf_val(String *token, double idf_val) {
     return new_t_idf_val;
 }
 
-FileTFIDFVal *create_file_tf_idf_val(String *filename, double tf_idf_val) {
+FileTFIDFVal *create_file_tf_idf_val(const char *filename, double tf_idf_val) {
     FileTFIDFVal *new_ft_idf_val = malloc(sizeof(FileTFIDFVal));
-    new_ft_idf_val->filename = string_create_from_charp(filename->str, filename->size);
+    new_ft_idf_val->filename = string_create_from_charp(filename, strlen(filename));
     new_ft_idf_val->tf_idf_val = tf_idf_val;
     return new_ft_idf_val;
 }
@@ -164,7 +168,7 @@ static void _tf_idf_file_map(HTEntry *entry, va_list args) {
     // tf_index of one file
     HashTable *tf_file_index = (HashTable *)entry->value;
 
-    printf("filename: %s\n", entry->key);
+    // printf("filename: %s\n", entry->key);
 
     // each node holds TokenIDFVal *
     Node *token = token_idf_list->head;
@@ -177,7 +181,12 @@ static void _tf_idf_file_map(HTEntry *entry, va_list args) {
         }
     }
 
-    printf("TF_IDF val = %.12lf\n", file_tf_idf_val);
+    // printf("TF_IDF val = %.12lf\n", file_tf_idf_val);
+
+    if (file_tf_idf_val == 0.0) return;
+
+    ll_append_left(file_tf_idf_list, create_node(create_file_tf_idf_val(
+                                         entry->key, file_tf_idf_val)));
 }
 
 LinkedList *calculate_tf_idf(HashTable *tf_index, LinkedList *token_idf_list) {

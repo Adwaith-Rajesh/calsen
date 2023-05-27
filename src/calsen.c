@@ -114,6 +114,8 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
     ht_free(file_tf_table);
 }
 
+// =========== Search ===========
+
 static void *_idf_token_map(Node *node, va_list args) {
     HashTable *index_table = va_arg(args, HashTable *);
     LinkedList *token_idf_list = va_arg(args, LinkedList *);
@@ -123,6 +125,12 @@ static void *_idf_token_map(Node *node, va_list args) {
                    create_node(create_token_idf_val((String *)node->data, idf_val)));
 
     return node->data;
+}
+
+static void *_free_token_idf_val_map(Node *node, va_list args) {
+    (void)args;
+    free_token_idf_val((TokenIDFVal *)node->data);
+    return NULL;
 }
 
 LinkedList *search(const char *query, const char *index_file) {
@@ -142,10 +150,19 @@ LinkedList *search(const char *query, const char *index_file) {
     ll_map(query_tokens, _idf_token_map, index, token_idf_list);
 
     // do IDF
-    calculate_tf_idf(index, token_idf_list);
+    // linked list of FileTFIDFVal *
+    LinkedList *file_tf_idf_list = calculate_tf_idf(index, token_idf_list);
 
     ll_map(query_tokens, _free_string_from_list);
     ll_free(query_tokens);
+
     // free the loaded index
+    ht_free_map(index, _tf_table_in_free);
+    ht_free(index);
+
     // free the token_idf_list
+    ll_map(token_idf_list, _free_token_idf_val_map);
+    ll_free(token_idf_list);
+
+    return file_tf_idf_list;
 }
