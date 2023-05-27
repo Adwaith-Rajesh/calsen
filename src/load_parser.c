@@ -52,7 +52,7 @@ HashTable *load_all_parsers() {
         char *dot = strrchr(d->d_name, '.');  // find the last dot(.)
 
         if (dot == NULL) continue;
-        shared_lib_path = string_create_from_charp(resolved_path, 256);
+        shared_lib_path = string_create_from_charp(resolved_path, PATH_MAX);
         if (strcmp(dot, ".so") == 0) {
             string_append_char(shared_lib_path, '/');
             string_append_charp(shared_lib_path, d->d_name);
