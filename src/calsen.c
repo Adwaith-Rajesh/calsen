@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "cstring.h"
 #include "hash_table.h"
@@ -43,7 +44,7 @@ static void *_free_fwm_from_list(Node *node, va_list args) {
     return NULL;
 }
 
-static void tf_table_in_free(void *ht) {
+static void _tf_table_in_free(void *ht) {
     ht_free_map((HashTable *)ht, tf_table_free_int);
     ht_free((HashTable *)ht);
 }
@@ -81,11 +82,8 @@ static void *_index_one_file(Node *node, va_list args) {
 }
 
 static void *_index_one_dir(Node *node, va_list args) {
-    va_list args_copy;
-    va_copy(args_copy, args);
-
-    HashTable *parsers = va_arg(args_copy, HashTable *);
-    HashTable *tf_table = va_arg(args_copy, HashTable *);
+    HashTable *parsers = va_arg(args, HashTable *);
+    HashTable *tf_table = va_arg(args, HashTable *);
 
     // get all the file to index along with their MIME type
     LinkedList *files_to_index = ll_init();
@@ -112,6 +110,59 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
     dump_index(output_file, file_tf_table);
     ht_free_map(parsers, unload_parser);
     ht_free(parsers);
-    ht_free_map(file_tf_table, tf_table_in_free);
+    ht_free_map(file_tf_table, _tf_table_in_free);
     ht_free(file_tf_table);
+}
+
+// =========== Search ===========
+
+static void *_idf_token_map(Node *node, va_list args) {
+    HashTable *index_table = va_arg(args, HashTable *);
+    LinkedList *token_idf_list = va_arg(args, LinkedList *);
+
+    double idf_val = calculate_idf(index_table, (String *)node->data);
+    ll_append_left(token_idf_list,
+                   create_node(create_token_idf_val((String *)node->data, idf_val)));
+
+    return node->data;
+}
+
+static void *_free_token_idf_val_map(Node *node, va_list args) {
+    (void)args;
+    free_token_idf_val((TokenIDFVal *)node->data);
+    return NULL;
+}
+
+LinkedList *search(const char *query, const char *index_file) {
+    // load the indexed data
+    HashTable *index = load_index(index_file);
+
+    // list to store all the tokens along with its idf vals
+    LinkedList *token_idf_list = ll_init();
+
+    // parse the query
+    // we are just gonna use the same function that tokenize the file content to
+    // tokenize the query.
+    int tw_var = 0;
+    LinkedList *query_tokens = file_content_to_tokens((char *)query, strlen(query), &tw_var);
+
+    // gets the number of files the token appeared in the corpus
+    ll_map(query_tokens, _idf_token_map, index, token_idf_list);
+
+    // do IDF
+    // linked list of FileTFIDFVal *
+    LinkedList *file_tf_idf_list = calculate_tf_idf(index, token_idf_list);
+
+    ll_map(query_tokens, _free_string_from_list);
+    ll_free(query_tokens);
+
+    // free the loaded index
+    ht_free_map(index, _tf_table_in_free);
+    ht_free(index);
+
+    // free the token_idf_list
+    ll_map(token_idf_list, _free_token_idf_val_map);
+    ll_free(token_idf_list);
+
+    return file_tf_idf_list;
 }

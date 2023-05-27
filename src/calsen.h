@@ -4,5 +4,6 @@
 #include "linked_list.h"
 
 void calsen_index_files(LinkedList *, const char *);
+LinkedList *search(const char *, const char *);
 
 #endif

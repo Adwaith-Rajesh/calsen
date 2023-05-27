@@ -32,6 +32,7 @@ SOFTWARE.
 #include "calsen.h"
 #include "cstring.h"
 #include "linked_list.h"
+#include "tf_idf.h"
 
 int verbose_flag;
 
@@ -65,6 +66,19 @@ static void *_ll_string_destroy(Node *node, va_list args) {
 
     return NULL;
 }
+
+static void _ll_print_file_tf_idf_map(Node *node) {
+    if (node == NULL) return;
+    string_print((String *)((FileTFIDFVal *)node->data)->filename);
+    printf("\n");
+}
+
+static void *_ll_free_file_tf_idf_map(Node *node, va_list args) {
+    (void)args;
+    free_file_tf_idf_val((FileTFIDFVal *)node->data);
+    return NULL;
+}
+
 void print_help(FILE *stream, int type, char *filename) {
     char *simple_usage =
         "Usage: %s <search/reindex> [OPTIONS]\n"
@@ -181,6 +195,11 @@ int main(int argc, char **argv) {
             print_help(stderr, 3, argv[0]);
             exit(1);
         }
+
+        LinkedList *file_list = search(query->str, index_file->str);
+        ll_print(file_list, _ll_print_file_tf_idf_map);
+        ll_map(file_list, _ll_free_file_tf_idf_map);
+        ll_free(file_list);
     }
 
     string_destroy(output_file);

@@ -139,8 +139,8 @@ void ll_iter_free(LLIter *iterator) {
 void ll_map(LinkedList *list, LinkedListMapFn *fn, ...) {
     Node *temp = list->head;
     va_list args;
-    va_start(args, fn);
     while (temp != NULL) {
+        va_start(args, fn);
         temp->data = fn(temp, args);
         temp = temp->next;
     }

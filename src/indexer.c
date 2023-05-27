@@ -156,7 +156,6 @@ static HashTable *_read_token(FILE *fp) {
         while ((ch = fgetc(fp)) != '=' && ch != EOF) {
             token_line = _string_expandable_append(token_line, ch);
         }
-        printf("token: %s\n", token_line->str);
 
         // read the TF val (14 bytes, after the '=')
         char tf_val[15];
@@ -189,11 +188,11 @@ HashTable *load_index(const char *index_file) {
             while ((ch = fgetc(fp)) != EOF && ch != '\n') {
                 line = _string_expandable_append(line, ch);
             }
-            printf("filename: %s\n", line->str);
             ht_set(index_table, line->str, NULL);
 
             // read the tokens
             ht_set(index_table, line->str, _read_token(fp));
+            string_reset(line);
         }
     }
 
@@ -212,11 +211,9 @@ static inline void _dump_line(FILE *fp, char *line, size_t size) {
 static void _dump_index_d_as_val(HTEntry *entry, va_list args) {
     // takes care of writing the individual tokens to the indexer file
     if (entry == NULL) return;
-    va_list args_copy;
-    va_copy(args_copy, args);
 
-    FILE *fp = va_arg(args_copy, FILE *);
-    String *line = va_arg(args_copy, String *);
+    FILE *fp = va_arg(args, FILE *);
+    String *line = va_arg(args, String *);
 
     string_append_charp(line, entry->key);
     string_append_char(line, '=');
@@ -230,10 +227,8 @@ static void _dump_index_map_ht_as_val(HTEntry *entry, va_list args) {
 
     if (entry == NULL) return;
     // the max size fo a filepath in linux is PATH_MAX(4096) +
-    va_list args_copy;
-    va_copy(args_copy, args);
 
-    FILE *fp = va_arg(args_copy, FILE *);
+    FILE *fp = va_arg(args, FILE *);
     String *line = string_create(PATH_MAX);
 
     string_append_charp(line, ":filename=");
