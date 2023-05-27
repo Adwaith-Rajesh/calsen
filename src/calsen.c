@@ -56,15 +56,14 @@ static void *_index_one_file(Node *node, va_list args) {
     FileWithMIME *fwm = (FileWithMIME *)node->data;
     HashTable *parsers = va_arg(args_copy, HashTable *);
     HashTable *tf_table = va_arg(args_copy, HashTable *);
-
-    if (verbose_flag) {
-        printf("indexing: %s\n", fwm->filepath->str);
-    }
     ParseFileFn *parse_fn = load_parser_entry_point(parsers, fwm->mime_type->str);
     if (parse_fn == NULL) return NULL;
     String *file_contents = string_create(get_file_size(fwm->filepath->str));
     parse_fn(fwm->filepath->str, file_contents);
 
+    if (verbose_flag) {
+        printf("indexing: %s\n", fwm->filepath->str);
+    }
     // get the tokens
     int original_token_count = 0;
     LinkedList *file_tokens = file_content_to_tokens(file_contents->str,
