@@ -1,5 +1,0 @@
-0.006317175213 : /home/adwaith/workspace/calsen/tmp/README.md
-0.044022814764 : /home/adwaith/workspace/calsen/tmp/test.txt
-begin sort
-0.044022814764 : /home/adwaith/workspace/calsen/tmp/test.txt
-0.006317175213 : /home/adwaith/workspace/calsen/tmp/README.md
