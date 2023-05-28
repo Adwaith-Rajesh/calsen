@@ -201,6 +201,9 @@ int main(int argc, char **argv) {
 
         LinkedList *file_list = search(query->str, index_file->str);
         ll_print(file_list, _ll_print_file_tf_idf_map);
+        printf("begin sort\n");
+        LinkedList *sorted_filter_list = filter_sort_file_tf_idf_list(file_list);
+        ll_print(sorted_filter_list, _ll_print_file_tf_idf_map);
         ll_map(file_list, _ll_free_file_tf_idf_map);
         ll_free(file_list);
     }

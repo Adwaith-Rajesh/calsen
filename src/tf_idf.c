@@ -196,3 +196,69 @@ LinkedList *calculate_tf_idf(HashTable *tf_index, LinkedList *token_idf_list) {
 
     return file_tf_idf_list;
 }
+
+// =========== TF-IDF file list clean up ===========
+
+// filter out the files that have TF-IDF below a certain threshold, and then sort based on
+// that threshold
+
+// currently the threshold is calculate by taking the average of all the TF-IDF values and
+// selecting the values that are above that average
+
+static double _average_tf_idf(LinkedList *file_tf_idf_list) {
+    double avg = 0.0;
+    Node *node = file_tf_idf_list->head;
+    for (; node != NULL; node = node->next) {
+        avg += ((FileTFIDFVal *)node->data)->tf_idf_val;
+    }
+
+    return avg / (double)file_tf_idf_list->size;
+}
+
+static inline FileTFIDFVal *_node_to_file_tf_idf(Node *node) {
+    return (FileTFIDFVal *)node->data;
+}
+
+// should not free the FileTFIDFVal stored in the returned LinkedList
+static void _sort_file_tf_idf_list(Node *file_tf_idf_list_head) {
+    {
+        int did_swapped = 0;
+        Node *start, *temp;
+        Node *prev = NULL;
+
+        // Checking for empty list
+        if (file_tf_idf_list_head == NULL)
+            return;
+
+        do {
+            did_swapped = 0;
+            start = file_tf_idf_list_head;
+
+            while (start->next != prev) {
+                if (start->data > start->next->data) {
+                    temp = start->data;
+                    start->data = start->next->data;
+                    start->next->data = temp;
+                    did_swapped = 1;
+                }
+                start = start->next;
+            }
+            prev = start;
+        } while (did_swapped);
+    }
+}
+
+// the LinkedList will have to updated manually without the use of the util functions
+
+LinkedList *filter_sort_file_tf_idf_list(LinkedList *file_tf_idf_list) {
+    _sort_file_tf_idf_list(file_tf_idf_list->head);
+    // double avg_tf_idf = _average_tf_idf(file_tf_idf_list);
+
+    // while (!ll_is_empty(file_tf_idf_list)) {
+    //     Node *node = ll_pop_left(file_tf_idf_list);
+    //     if (_node_to_file_tf_idf(node)->tf_idf_val < avg_tf_idf) {
+    //     }
+    // }
+
+    return file_tf_idf_list;
+}
