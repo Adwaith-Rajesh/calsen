@@ -205,6 +205,9 @@ LinkedList *calculate_tf_idf(HashTable *tf_index, LinkedList *token_idf_list) {
 // currently the threshold is calculate by taking the average of all the TF-IDF values and
 // selecting the values that are above that average
 // the LinkedList will have to updated manually without the use of the util functions
+static inline FileTFIDFVal *_node_to_file_tf_idf(Node *node) {
+    return (FileTFIDFVal *)node->data;
+}
 
 static LinkedList *_filter_n_td_idf_file_list(LinkedList *file_tf_idf_list, int n_results) {
     if ((n_results == (int)file_tf_idf_list->size) || (n_results == 0))
@@ -220,14 +223,11 @@ static LinkedList *_filter_n_td_idf_file_list(LinkedList *file_tf_idf_list, int 
     // delete the rest of the nodes
     while (temp) {
         Node *t = temp;
+        free_file_tf_idf_val(_node_to_file_tf_idf(t));
         temp = temp->next;
         free_node(t);
     }
     return file_tf_idf_list;
-}
-
-static inline FileTFIDFVal *_node_to_file_tf_idf(Node *node) {
-    return (FileTFIDFVal *)node->data;
 }
 
 // should not free the FileTFIDFVal stored in the returned LinkedList
