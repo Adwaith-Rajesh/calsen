@@ -3,7 +3,7 @@
 
 #include "linked_list.h"
 
-void calsen_index_files(LinkedList *, const char *);
-LinkedList *search(const char *, const char *);
+void calsen_index_files(LinkedList *dir_list, const char *output_file);
+LinkedList *search(const char *query, const char *index_file);
 
 #endif
