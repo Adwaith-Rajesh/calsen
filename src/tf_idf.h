@@ -27,6 +27,6 @@ FileTFIDFVal *create_file_tf_idf_val(const char *, double);
 void free_token_idf_val(TokenIDFVal *);
 void free_file_tf_idf_val(FileTFIDFVal *);
 LinkedList *calculate_tf_idf(HashTable *, LinkedList *);
-LinkedList *filter_sort_file_tf_idf_list(LinkedList *);
+LinkedList *filter_sort_file_tf_idf_list(LinkedList *, int);
 
 #endif

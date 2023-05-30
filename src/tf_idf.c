@@ -204,15 +204,26 @@ LinkedList *calculate_tf_idf(HashTable *tf_index, LinkedList *token_idf_list) {
 
 // currently the threshold is calculate by taking the average of all the TF-IDF values and
 // selecting the values that are above that average
+// the LinkedList will have to updated manually without the use of the util functions
 
-static double _average_tf_idf(LinkedList *file_tf_idf_list) {
-    double avg = 0.0;
-    Node *node = file_tf_idf_list->head;
-    for (; node != NULL; node = node->next) {
-        avg += ((FileTFIDFVal *)node->data)->tf_idf_val;
+static LinkedList *_filter_n_td_idf_file_list(LinkedList *file_tf_idf_list, int n_results) {
+    if ((n_results == (int)file_tf_idf_list->size) || (n_results == 0))
+        return file_tf_idf_list;
+
+    Node *list_head = file_tf_idf_list->head;
+    for (int i = 0; i < n_results - 1; i++) {
+        list_head = list_head->next;
     }
+    Node *temp = list_head->next;
+    list_head->next = NULL;
 
-    return avg / (double)file_tf_idf_list->size;
+    // delete the rest of the nodes
+    while (temp) {
+        Node *t = temp;
+        temp = temp->next;
+        free_node(t);
+    }
+    return file_tf_idf_list;
 }
 
 static inline FileTFIDFVal *_node_to_file_tf_idf(Node *node) {
@@ -247,17 +258,9 @@ static void _sort_file_tf_idf_list(Node *file_tf_idf_list_head) {
     } while (did_swapped);
 }
 
-// the LinkedList will have to updated manually without the use of the util functions
-
-LinkedList *filter_sort_file_tf_idf_list(LinkedList *file_tf_idf_list) {
+LinkedList *filter_sort_file_tf_idf_list(LinkedList *file_tf_idf_list, int n_results) {
     _sort_file_tf_idf_list(file_tf_idf_list->head);
-    // double avg_tf_idf = _average_tf_idf(file_tf_idf_list);
-
-    // while (!ll_is_empty(file_tf_idf_list)) {
-    //     Node *node = ll_pop_left(file_tf_idf_list);
-    //     if (_node_to_file_tf_idf(node)->tf_idf_val < avg_tf_idf) {
-    //     }
-    // }
+    _filter_n_td_idf_file_list(file_tf_idf_list, n_results);
 
     return file_tf_idf_list;
 }
