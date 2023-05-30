@@ -101,8 +101,9 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
     HashTable *file_tf_table = ht_create();
 
     HashTable *parsers = load_all_parsers();
-    // text/plain parsers can also parse text/x-c
+    // text/plain parsers can also parse text/x-c and text/java
     ht_set(parsers, "text_x-c.so", ht_get(parsers, "text_plain.so"));
+    ht_set(parsers, "text_x-java.so", ht_get(parsers, "text_plain.so"));
 
     ll_map(dir_list, _index_one_dir, parsers, file_tf_table);
 
