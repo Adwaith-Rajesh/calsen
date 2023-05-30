@@ -69,6 +69,9 @@ static void *_ll_string_destroy(Node *node, va_list args) {
 
 static void _ll_print_file_tf_idf_map(Node *node) {
     if (node == NULL) return;
+
+    if (verbose_flag)
+        printf("%.12lf : ", ((FileTFIDFVal *)node->data)->tf_idf_val);
     string_print((String *)((FileTFIDFVal *)node->data)->filename);
     printf("\n");
 }
@@ -95,6 +98,7 @@ void print_help(FILE *stream, int type, char *filename) {
         "--index, -i \tThe file that contains the indexed data.\n"
         "--query, -q \tThe query to search.\n"
         "--verbose, -v \tGet verbose output.\n"
+        "--number, -n \tNumber of results required."
         "--help, -h \tShow this message and quit.\n";
 
     switch (type) {
@@ -130,6 +134,7 @@ int main(int argc, char **argv) {
     String *argv_1_val = NULL;
     String *query = NULL;
     LinkedList *dir_list = NULL;
+    int n_results = 0;
 
     struct option long_options[] = {
         {"verbose", no_argument, &verbose_flag, 1},
@@ -138,6 +143,7 @@ int main(int argc, char **argv) {
         {"index", required_argument, 0, 'i'},
         {"dir", required_argument, 0, 'd'},
         {"query", required_argument, 0, 'q'},
+        {"number", optional_argument, 0, 'n'},
         {0, 0, 0, 0},
     };
 
@@ -148,7 +154,7 @@ int main(int argc, char **argv) {
 
     while (1) {
         int options_index = 0;
-        c = getopt_long(argc, argv, "o:i:d:q:", long_options, &options_index);
+        c = getopt_long(argc, argv, "o:i:d:q:n:", long_options, &options_index);
 
         if (c == -1) break;
 
@@ -165,6 +171,8 @@ int main(int argc, char **argv) {
             case 'q':
                 query = string_create_from_charp(optarg, strlen(optarg));
                 break;
+            case 'n':
+                n_results = atoi(optarg);
         }
     }
 
@@ -197,7 +205,8 @@ int main(int argc, char **argv) {
         }
 
         LinkedList *file_list = search(query->str, index_file->str);
-        ll_print(file_list, _ll_print_file_tf_idf_map);
+        LinkedList *sorted_filter_list = filter_sort_file_tf_idf_list(file_list, n_results);
+        ll_print(sorted_filter_list, _ll_print_file_tf_idf_map);
         ll_map(file_list, _ll_free_file_tf_idf_map);
         ll_free(file_list);
     }

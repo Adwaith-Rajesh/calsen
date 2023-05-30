@@ -196,3 +196,71 @@ LinkedList *calculate_tf_idf(HashTable *tf_index, LinkedList *token_idf_list) {
 
     return file_tf_idf_list;
 }
+
+// =========== TF-IDF file list clean up ===========
+
+// filter out the files that have TF-IDF below a certain threshold, and then sort based on
+// that threshold
+
+// currently the threshold is calculate by taking the average of all the TF-IDF values and
+// selecting the values that are above that average
+// the LinkedList will have to updated manually without the use of the util functions
+static inline FileTFIDFVal *_node_to_file_tf_idf(Node *node) {
+    return (FileTFIDFVal *)node->data;
+}
+
+static LinkedList *_filter_n_td_idf_file_list(LinkedList *file_tf_idf_list, int n_results) {
+    if ((n_results == (int)file_tf_idf_list->size) || (n_results == 0))
+        return file_tf_idf_list;
+
+    Node *list_head = file_tf_idf_list->head;
+    for (int i = 0; i < n_results - 1; i++) {
+        list_head = list_head->next;
+    }
+    Node *temp = list_head->next;
+    list_head->next = NULL;
+
+    // delete the rest of the nodes
+    while (temp) {
+        Node *t = temp;
+        free_file_tf_idf_val(_node_to_file_tf_idf(t));
+        temp = temp->next;
+        free_node(t);
+    }
+    return file_tf_idf_list;
+}
+
+// should not free the FileTFIDFVal stored in the returned LinkedList
+static void _sort_file_tf_idf_list(Node *file_tf_idf_list_head) {
+    int did_swapped = 0;
+    Node *start;
+    void *temp;
+    Node *prev = NULL;
+
+    // Checking for empty list
+    if (file_tf_idf_list_head == NULL)
+        return;
+
+    do {
+        did_swapped = 0;
+        start = file_tf_idf_list_head;
+
+        while (start->next != prev) {
+            if (_node_to_file_tf_idf(start)->tf_idf_val < _node_to_file_tf_idf(start->next)->tf_idf_val) {
+                temp = start->data;
+                start->data = start->next->data;
+                start->next->data = temp;
+                did_swapped = 1;
+            }
+            start = start->next;
+        }
+        prev = start;
+    } while (did_swapped);
+}
+
+LinkedList *filter_sort_file_tf_idf_list(LinkedList *file_tf_idf_list, int n_results) {
+    _sort_file_tf_idf_list(file_tf_idf_list->head);
+    _filter_n_td_idf_file_list(file_tf_idf_list, n_results);
+
+    return file_tf_idf_list;
+}
