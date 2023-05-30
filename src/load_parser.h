@@ -6,7 +6,7 @@
 typedef void ParseFileFn(const char *, String *);
 
 HashTable *load_all_parsers();
-ParseFileFn *load_parser_entry_point(HashTable *, char *);
-void unload_parser(void *);
+ParseFileFn *load_parser_entry_point(HashTable *table, char *mime);
+void unload_parser(void *lib_handle);
 
 #endif

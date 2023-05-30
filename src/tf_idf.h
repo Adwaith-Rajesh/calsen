@@ -17,16 +17,16 @@ typedef struct {
     double tf_idf_val;
 } FileTFIDFVal;
 
-HashTable *token_count(LinkedList *);
-void calculate_tf(HashTable *, int);
-void tf_table_free_int(void *);
-double calculate_idf(HashTable *, String *);
+HashTable *token_count(LinkedList *token_list);
+void calculate_tf(HashTable *tf_values, int token_count);
+void tf_table_free_int(void *int_val);
+double calculate_idf(HashTable *index_table, String *token);
 
-TokenIDFVal *create_token_idf_val(String *, double);
-FileTFIDFVal *create_file_tf_idf_val(const char *, double);
-void free_token_idf_val(TokenIDFVal *);
-void free_file_tf_idf_val(FileTFIDFVal *);
-LinkedList *calculate_tf_idf(HashTable *, LinkedList *);
-LinkedList *filter_sort_file_tf_idf_list(LinkedList *, int);
+TokenIDFVal *create_token_idf_val(String *token, double idf_val);
+FileTFIDFVal *create_file_tf_idf_val(const char *filename, double tf_idf_val);
+void free_token_idf_val(TokenIDFVal *tf_idf_val);
+void free_file_tf_idf_val(FileTFIDFVal *ft_idf_val);
+LinkedList *calculate_tf_idf(HashTable *tf_index, LinkedList *token_idf_list);
+LinkedList *filter_sort_file_tf_idf_list(LinkedList *file_tf_idf_list, int n_results);
 
 #endif

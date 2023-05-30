@@ -11,6 +11,6 @@ typedef struct {
     size_t curr_idx;
 } Lexer;
 
-LinkedList *file_content_to_tokens(char *, size_t, int *);
+LinkedList *file_content_to_tokens(char *content, size_t size, int *token_count);
 
 #endif
