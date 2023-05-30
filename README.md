@@ -16,9 +16,8 @@ A search engine to search for local files based on their contents and not just t
 - [x] Do the above step for all the files in a specified directory
 - [x] Figure out a way to store the indexed data.
 - [x] Get the query, calculate the TF-IDF score for each file
-- [ ] then display the top N files.
+- [x] then display the top N files.
   - Parsing the query
-- [ ] Build a new UI (MayBe)
 
 ---
 
