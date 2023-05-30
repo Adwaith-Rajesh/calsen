@@ -221,31 +221,30 @@ static inline FileTFIDFVal *_node_to_file_tf_idf(Node *node) {
 
 // should not free the FileTFIDFVal stored in the returned LinkedList
 static void _sort_file_tf_idf_list(Node *file_tf_idf_list_head) {
-    {
-        int did_swapped = 0;
-        Node *start, *temp;
-        Node *prev = NULL;
+    int did_swapped = 0;
+    Node *start;
+    void *temp;
+    Node *prev = NULL;
 
-        // Checking for empty list
-        if (file_tf_idf_list_head == NULL)
-            return;
+    // Checking for empty list
+    if (file_tf_idf_list_head == NULL)
+        return;
 
-        do {
-            did_swapped = 0;
-            start = file_tf_idf_list_head;
+    do {
+        did_swapped = 0;
+        start = file_tf_idf_list_head;
 
-            while (start->next != prev) {
-                if (start->data > start->next->data) {
-                    temp = start->data;
-                    start->data = start->next->data;
-                    start->next->data = temp;
-                    did_swapped = 1;
-                }
-                start = start->next;
+        while (start->next != prev) {
+            if (_node_to_file_tf_idf(start)->tf_idf_val < _node_to_file_tf_idf(start->next)->tf_idf_val) {
+                temp = start->data;
+                start->data = start->next->data;
+                start->next->data = temp;
+                did_swapped = 1;
             }
-            prev = start;
-        } while (did_swapped);
-    }
+            start = start->next;
+        }
+        prev = start;
+    } while (did_swapped);
 }
 
 // the LinkedList will have to updated manually without the use of the util functions
