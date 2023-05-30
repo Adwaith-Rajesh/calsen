@@ -31,4 +31,53 @@ A search engine to search for local files based on their contents and not just t
 
 ---
 
+### Getting started
+
+#### Installation
+
+- clone the repo and cd into calsen.
+
+```console
+git clone --depth=1 https://github.com/Adwaith-Rajesh/calsen.git
+```
+
+- compiling
+  [`Calsen`](https://github.com/Adwaith-Rajesh/calsen/) makes use of [nobuild](https://github.com/tsoding/nobuild) as it's build system. To compile run the following commands
+
+```console
+gcc -o nobuild ./nobuild.c
+./nobuild
+ln -s ./build/bin/calsen ./calsen
+```
+
+#### Indexing
+
+To index the required directories run.
+
+```console
+./calsen reindex --dir path/to/dir/1 --dir path/to/dir/2 -o sample.index
+```
+
+> Use `--verbose` to get additional output
+
+This will create a `.index` file that _Calsen_ will use during the search process.
+
+#### Searching
+
+Inorder to search through the indexed file you can use the following command.
+
+```console
+./calsen search -i sample.index -q 'search query'
+```
+
+_Calsen_ will find all the files that matches the _"search query"_ and arranges them in descending of relevancy
+
+- To get top N files
+
+```calsen
+./calsen search -i sample.index -q 'search query' -n 10
+```
+
+> Use `--verbose` to get the calculated TF-IDF score for each file
+
 ### Bye...
