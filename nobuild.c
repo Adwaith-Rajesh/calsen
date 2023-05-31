@@ -6,7 +6,7 @@
 #include <string.h>
 
 #define CC "cc"  // use the default compiler to compile the code
-#define C_FLAGS "-g", "-Wall", "-Wextra", "-std=c11", "-I./src", "-I./src/utils"
+#define C_FLAGS "-O3", "-Wall", "-Wextra", "-std=c11", "-I./src", "-I./src/utils"
 
 #define OUT_DIR "./build/out"
 #define BIN_DIR "./build/bin"

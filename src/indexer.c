@@ -159,7 +159,10 @@ static HashTable *_read_token(FILE *fp) {
 
         // read the TF val (14 bytes, after the '=')
         char tf_val[15];
-        fgets(tf_val, 15, fp);
+        if (fgets(tf_val, 15, fp) == NULL) {
+            fprintf(stderr, "Error reading token");
+            exit(1);
+        }
 
         double *db_val = malloc(sizeof(double));
         *db_val = strtod(tf_val, &tw);
