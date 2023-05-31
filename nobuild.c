@@ -1,15 +1,18 @@
 #define NOBUILD_IMPLEMENTATION
 #include "nobuild.h"
 
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define CC "cc"  // use the default compiler to compile the code
-#define C_FLAGS "-g", "-Wall", "-Wextra", "-std=c11", "-I./src", "-I./src/utils"
+#define C_FLAGS (in_release) ? "-O3" : "-g", "-Wall", "-Wextra", "-std=c11", "-I./src", "-I./src/utils"
 
 #define OUT_DIR "./build/out"
 #define BIN_DIR "./build/bin"
+
+int in_release = 0;
 
 typedef struct {
     char parser_file_name[20];
@@ -76,6 +79,9 @@ void build_calsen() {
     cmd_run_sync(cmd);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overread"
+
 int custom_parser_check_execute(Cstr file) {
     CParserCompileCommand cp_commands[] = {
         // sample code
@@ -94,6 +100,8 @@ int custom_parser_check_execute(Cstr file) {
 
     if (!cp_commands_len) return 0;
 
+    // this loop will only run if there is an element in the array
+    // so its safe to access it and also ignore the "-Wstringop-overread" warning
     for (size_t i = 0; i < cp_commands_len; i++) {
         if (strcmp(file, cp_commands[i].parser_file_name) == 0) {
             INFO("CMD: %s", cmd_show(cp_commands[i].cmd));
@@ -103,6 +111,8 @@ int custom_parser_check_execute(Cstr file) {
     }
     return 0;
 }
+
+#pragma GCC diagnostic pop
 
 void build_parsers() {
     INFO("Building parsers");
@@ -123,11 +133,19 @@ void build_parsers() {
 }
 
 int main(int argc, char **argv) {
+    GO_REBUILD_URSELF(argc, argv);
+
+    int option_index = 0;
+    struct option long_options[] = {
+        {"release", no_argument, &in_release, 1},
+        {0, 0, 0, 0},
+    };
+
+    int c = getopt_long(argc, argv, "", long_options, &option_index);
+
     MKDIRS("build", "out");
     MKDIRS("build", "bin");
     MKDIRS("build", "parsers");
-
-    GO_REBUILD_URSELF(argc, argv);
     build_src();
     build_src_utils();
     build_calsen();

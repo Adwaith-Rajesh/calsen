@@ -65,7 +65,7 @@ Node *ll_pop(LinkedList *list) {
         list->size--;
         return temp;
     }
-    Node *prev;
+    Node *prev = NULL;
     Node *curr = list->head;
 
     while (curr->next != NULL) {

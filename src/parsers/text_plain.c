@@ -13,7 +13,10 @@ void parse_file(const char *pathname, String *str) {
         fprintf(stderr, "Could not open file: %s : %s\n", pathname, strerror(errno));
         exit(1);
     }
-    fread(str->str, str->size, 1, fp);
+    size_t read_bytes = fread(str->str, str->size, 1, fp);
+    if (read_bytes == 0) {
+        fprintf(stderr, "Error, reading contents of: %s", pathname);
+    }
     fclose(fp);
 }
 #pragma GCC diagnostic pop
