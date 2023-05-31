@@ -39,14 +39,22 @@ A search engine to search for local files based on their contents and not just t
 
 ```console
 git clone --depth=1 https://github.com/Adwaith-Rajesh/calsen.git
+cd calsen
 ```
 
-- compiling
-  [`Calsen`](https://github.com/Adwaith-Rajesh/calsen/) makes use of [nobuild](https://github.com/tsoding/nobuild) as it's build system. To compile run the following commands
+- dependencies (I've plans to make this optional [#2](https://github.com/Adwaith-Rajesh/calsen/issues/2))
+
+```console
+apt install libmagic-dev
+```
+
+#### Compiling
+
+[`Calsen`](https://github.com/Adwaith-Rajesh/calsen/) makes use of [nobuild](https://github.com/tsoding/nobuild) as it's build system. To compile run the following commands
 
 ```console
 gcc -o nobuild ./nobuild.c
-./nobuild
+./nobuild --release
 ln -s ./build/bin/calsen ./calsen
 ```
 
