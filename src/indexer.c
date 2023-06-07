@@ -129,20 +129,6 @@ key, "points" to another hash table where each key is token with its tf value
 
 /* =============== Load the contents from the file =============== */
 
-// check if the char can be appended, otherwise create a new string
-// with double the size. It' static as indexer might be the only place where this is needed
-static String *_string_expandable_append(String *str, char c) {
-    if (str->curr_p < str->size - 1) {
-        string_append_char(str, c);
-        return str;
-    } else {
-        String *new_string = string_create_from_charp(str->str, str->size * 2);
-        string_destroy(str);
-        return new_string;
-    }
-    return NULL;
-}
-
 static HashTable *_read_token(FILE *fp) {
     HashTable *token_table = ht_create();
     int ch;
@@ -152,9 +138,9 @@ static HashTable *_read_token(FILE *fp) {
     while ((ch = fgetc(fp)) != ':' && ch != EOF) {
         // read the token name
         String *token_line = string_create(20);
-        token_line = _string_expandable_append(token_line, ch);
+        token_line = string_expandable_append(token_line, ch);
         while ((ch = fgetc(fp)) != '=' && ch != EOF) {
-            token_line = _string_expandable_append(token_line, ch);
+            token_line = string_expandable_append(token_line, ch);
         }
 
         // read the TF val (14 bytes, after the '=')
@@ -190,7 +176,7 @@ HashTable *load_index(const char *index_file) {
             fseek(fp, 9, SEEK_CUR);
             // now we read the filename
             while ((ch = fgetc(fp)) != EOF && ch != '\n') {
-                line = _string_expandable_append(line, ch);
+                line = string_expandable_append(line, ch);
             }
             ht_set(index_table, line->str, NULL);
 

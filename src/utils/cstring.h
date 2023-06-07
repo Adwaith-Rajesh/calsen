@@ -24,5 +24,6 @@ String *string_create_from_charp_slice(CharPSlice *);
 void charp_slice_to_charp_array(CharPSlice *, char[]);
 void charp_slice_print(CharPSlice *);
 void string_reset(String *);
+String *string_expandable_append(String *, char c);
 
 #endif
