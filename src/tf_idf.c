@@ -210,7 +210,7 @@ static inline FileTFIDFVal *_node_to_file_tf_idf(Node *node) {
 }
 
 static LinkedList *_filter_n_td_idf_file_list(LinkedList *file_tf_idf_list, int n_results) {
-    if ((n_results == (int)file_tf_idf_list->size) || (n_results == 0))
+    if ((n_results >= (int)file_tf_idf_list->size) || (n_results == 0))
         return file_tf_idf_list;
 
     Node *list_head = file_tf_idf_list->head;
