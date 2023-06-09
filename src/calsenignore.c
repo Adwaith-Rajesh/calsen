@@ -8,10 +8,6 @@
 #include "cstring.h"
 #include "linked_list.h"
 
-static void _node_printer(Node *node) {
-    string_print((String *)node->data);
-}
-
 // returns: LikedList[String]  i.e. a linked list of patterns to match
 LinkedList *parse_ignore_file(const char *filepath) {
     FILE *fp = fopen(filepath, "r");
@@ -47,3 +43,8 @@ LinkedList *parse_ignore_file(const char *filepath) {
     fclose(fp);
     return pattern_list;
 }
+
+static int _check_pattern_match(const char *pattern, const char *str) {
+}
+
+int check_file_name_is_ignored(LinkedList *patterns, const char *str) {}

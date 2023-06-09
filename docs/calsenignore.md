@@ -3,7 +3,7 @@
 allow the user to ignore files and folder from being indexed
 
 - \* -> matches 0 to more characters
-- ? -> matched 0 or 1 character
+- ? -> matches 1 character
 
 ## rules
 
