@@ -23,28 +23,23 @@ LinkedList *parse_ignore_file(const char *filepath) {
 
     LinkedList *pattern_list = ll_init();
 
-    if (fp == NULL) {
-        fprintf(stderr, "ERROR: could not open %s : %s\n", filepath, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
     // read character by character until we reach newline or '#'
-    // we will then consider that string as a patter
+    // we will then consider that string as a pattern
     int ch;
     String *pattern = string_create(20);
     while ((ch = fgetc(fp)) != EOF) {
         if (ch == '#')
             while ((ch != '\n') && (ch != EOF)) {
                 ch = fgetc(fp);
-                printf("char: %d\n", ch);
             }
 
         if (ch == '\n') {
-            if (pattern->size != 0) {
-                ll_append_left(pattern_list, create_node(string_create_from_charp(pattern->str, pattern->size)));
+            if (pattern->curr_p != 0) {
+                String *strip_pattern = string_strip(pattern, 0);
+                ll_append_left(pattern_list, create_node(strip_pattern));
                 string_reset(pattern);
-                continue;
             }
+            continue;
         }
         pattern = string_expandable_append(pattern, ch);
     }
