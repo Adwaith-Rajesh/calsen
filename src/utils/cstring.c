@@ -1,5 +1,6 @@
 #include "cstring.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -98,4 +99,25 @@ String *string_expandable_append(String *str, char c) {
         return new_string;
     }
     return NULL;
+}
+
+String *string_strip(String *string, int destroy_prev) {
+    String *new_string = string_create(string->size);
+
+    if (string->size == 0) {
+        if (destroy_prev == 1) string_destroy(string);
+        return new_string;  // we always return a new string
+    }
+
+    size_t start_idx = 0;
+    size_t end_idx = string->curr_p - 1;
+    while (start_idx < string->size && isspace(string->str[start_idx])) start_idx++;  // removes the leading whitespaces
+    while (end_idx >= start_idx && isspace(string->str[end_idx])) end_idx--;
+
+    for (size_t i = start_idx; i <= end_idx; i++) {
+        string_append_char(new_string, string->str[i]);
+    }
+
+    if (destroy_prev == 1) string_destroy(string);
+    return new_string;
 }

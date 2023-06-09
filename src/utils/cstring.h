@@ -26,4 +26,9 @@ void charp_slice_print(CharPSlice *slice);
 void string_reset(String *string);
 String *string_expandable_append(String *str, char c);
 
+// strip String of trailing white space characters and returns a new
+// String which has to be freed
+// if destroy_prev is true / 1 then the provided string is destroyed.
+String *string_strip(String *string, int destroy_prev);
+
 #endif
