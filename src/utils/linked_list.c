@@ -4,17 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void *_malloc_with_check(size_t size) {
-    void *ptr = malloc(size);
-    if (ptr == NULL) {
-        fprintf(stderr, "Could not allocate memory\n");
-        exit(1);
-    }
-    return ptr;
-}
+#include "memfns.h"
 
 Node *create_node(void *data) {
-    Node *new_node = (Node *)_malloc_with_check(sizeof(Node));
+    Node *new_node = (Node *)malloc_with_check(sizeof(Node));
     new_node->data = data;
     new_node->next = NULL;
     return new_node;
@@ -26,7 +19,7 @@ void free_node(Node *node) {
 }
 
 LinkedList *ll_init() {
-    LinkedList *new_list = (LinkedList *)_malloc_with_check(sizeof(LinkedList));
+    LinkedList *new_list = (LinkedList *)malloc_with_check(sizeof(LinkedList));
 
     new_list->head = NULL;
     new_list->size = 0;
@@ -119,7 +112,7 @@ void ll_free(LinkedList *list) {
 }
 
 LLIter *ll_iter_init(LinkedList *list) {
-    LLIter *new_iter = (LLIter *)_malloc_with_check(sizeof(LLIter));
+    LLIter *new_iter = (LLIter *)malloc_with_check(sizeof(LLIter));
     new_iter->curr = list->head;
     return new_iter;
 }

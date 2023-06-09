@@ -3,12 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "memfns.h"
+
 String *string_create(size_t size) {
     if (size < 1) return NULL;
     String *new_string;
 
-    new_string = malloc(sizeof(String));
-    new_string->str = malloc(sizeof(char) * size);
+    new_string = malloc_with_check(sizeof(String));
+    new_string->str = malloc_with_check(sizeof(char) * size);
 
     new_string->str[0] = '\0';
     new_string->curr_p = 0;

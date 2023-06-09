@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "memfns.h"
+
 static unsigned int _hash(const char *key) {
     unsigned long int value = 0;
     unsigned int i = 0;
@@ -17,8 +19,8 @@ static unsigned int _hash(const char *key) {
 }
 
 static HTEntry *ht_pair(const char *key, void *value) {
-    HTEntry *new_entry = malloc(sizeof(HTEntry));
-    new_entry->key = malloc(strlen(key) + 1);
+    HTEntry *new_entry = malloc_with_check(sizeof(HTEntry));
+    new_entry->key = malloc_with_check(strlen(key) + 1);
     new_entry->value = value;
 
     strcpy(new_entry->key, key);
@@ -27,8 +29,8 @@ static HTEntry *ht_pair(const char *key, void *value) {
 }
 
 HashTable *ht_create(void) {
-    HashTable *new_ht = malloc(sizeof(HashTable));
-    new_ht->entries = malloc(sizeof(HTEntry *) * HASH_TABLE_SIZE);
+    HashTable *new_ht = malloc_with_check(sizeof(HashTable));
+    new_ht->entries = malloc_with_check(sizeof(HTEntry *) * HASH_TABLE_SIZE);
 
     for (int i = 0; i < HASH_TABLE_SIZE; ++i) {
         new_ht->entries[i] = NULL;
