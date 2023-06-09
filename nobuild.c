@@ -43,6 +43,23 @@ void build_src_utils() {
     });
 }
 
+void build_src_config() {
+    INFO("Building src/config");
+
+    const char *src_config_dir = "./src/config";
+
+    if (!IS_DIR(src_config_dir)) {
+        INFO("provided src/config dir not a dir!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    FOREACH_FILE_IN_DIR(file, src_config_dir, {
+        if (ENDS_WITH(file, ".c")) {
+            _build_object_file(file, PATH("src", "config", file));
+        }
+    });
+}
+
 void build_src() {
     INFO("Building main");
     const char *src_dir = "./src";
@@ -58,15 +75,12 @@ void build_src() {
 
 void build_calsen() {
     INFO("Building Calsen");
-    const char *out_dir = "./build/out";
-    const char *bin_dir = "./build/bin";
-
     Cstr_Array line = cstr_array_make(CC, C_FLAGS, "-o",
-                                      PATH(bin_dir, "calsen"),
+                                      PATH(BIN_DIR, "calsen"),
                                       NULL);
-    FOREACH_FILE_IN_DIR(file, out_dir, {
+    FOREACH_FILE_IN_DIR(file, OUT_DIR, {
         if (ENDS_WITH(file, ".o")) {
-            line = cstr_array_append(line, PATH(out_dir, file));
+            line = cstr_array_append(line, PATH(OUT_DIR, file));
         }
     });
     line = cstr_array_append(line, "-ldl");
@@ -148,6 +162,7 @@ int main(int argc, char **argv) {
     MKDIRS("build", "parsers");
     build_src();
     build_src_utils();
+    build_src_config();
     build_calsen();
     build_parsers();
     return EXIT_SUCCESS;
