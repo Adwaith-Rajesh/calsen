@@ -1,3 +1,5 @@
+// License: GPL v3 Copyright: 2023, Adwaith Rajesh <adwaithrajesh3180@gmail.com>
+
 #define NOBUILD_IMPLEMENTATION
 #include "nobuild.h"
 
@@ -48,11 +50,7 @@ void build_src_config(char *config_file_path) {
     INFO("Building src/config");
 
     const char *src_config_dir = "./src/config";
-
-    size_t s = strlen(config_file_path) + 25;
-    char config_path[s];
-
-    snprintf(config_path, s, "-DCALSENCONFIG=\"\\\"%s\\\"\"", config_file_path);
+    char *config_path = JOIN("", "-DCALSENCONFIG=\"", config_file_path, "\"");
 
     if (!IS_DIR(src_config_dir)) {
         INFO("provided src/config dir not a dir!\n");
