@@ -56,18 +56,10 @@ static void _parse_config_file(const char *filepath, config_t *c) {
     fclose(fp);
 }
 
-static void _create_config_file(const char *filepath, config_t *c) {
-}
-
 /*
-if the config file passed during compilation is "", we will check for the existence
-of ~/.config/calsen/.calsenconfig. If does not exist the file will be crated with default values,
-
-if CALSENIGNORE, CALSEN_PARSER_DIR and CALSEN_INDEX is present as environment variables the file will not be
-parsed
-
 if a filepath was passed during compilation then the file will checked and parsed, if the file
-path is invalid then the program stops instantly.
+path is invalid then the program stops instantly
+all the parsed configs can be overriden by env vars, and those can be overriden by the CLI
  */
 
 config_t config;  // a simple cache
