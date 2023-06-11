@@ -14,6 +14,7 @@
 
 #define OUT_DIR "./build/out"
 #define BIN_DIR "./build/bin"
+#define PARSERS_DIR "./build/parsers"
 
 int in_release = 0;
 int no_load_config = 0;
@@ -47,6 +48,9 @@ void build_src_utils() {
     });
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+
 void build_src_config(char *config_file_path) {
     INFO("Building src/config");
 
@@ -70,6 +74,8 @@ void build_src_config(char *config_file_path) {
     });
 }
 
+#pragma GCC diagnostic pop
+
 void build_src() {
     INFO("Building main");
     const char *src_dir = "./src";
@@ -83,10 +89,14 @@ void build_src() {
     }
 }
 
-void build_calsen() {
+void build_calsen(char *exe_dir) {
     INFO("Building Calsen");
+    if (!IS_DIR(exe_dir)) {
+        ERRO("exe directory does not exist");
+        return;
+    }
     Cstr_Array line = cstr_array_make(CC, C_FLAGS, "-o",
-                                      PATH(BIN_DIR, "calsen"),
+                                      PATH(exe_dir, "calsen"),
                                       NULL);
     FOREACH_FILE_IN_DIR(file, OUT_DIR, {
         if (ENDS_WITH(file, ".o")) {
@@ -138,9 +148,9 @@ int custom_parser_check_execute(Cstr file) {
 
 #pragma GCC diagnostic pop
 
-void build_parsers() {
+void build_parsers(char *parsers_dir) {
     INFO("Building parsers");
-    if (!IS_DIR("./src/parsers")) {
+    if (!IS_DIR(parsers_dir)) {
         ERRO("parser directory does not exist");
         return;
     }
@@ -148,7 +158,7 @@ void build_parsers() {
         if (ENDS_WITH(file, ".c")) {
             if (!custom_parser_check_execute(file)) {
                 CMD(CC, C_FLAGS, "-shared", "-fPIC", "-o",
-                    PATH("build", "parsers", CONCAT(NOEXT(file), ".so")),
+                    PATH(parsers_dir, CONCAT(NOEXT(file), ".so")),
                     PATH(OUT_DIR, "cstring.o"),
                     PATH("./src/parsers", file));
             }
@@ -156,18 +166,37 @@ void build_parsers() {
     });
 }
 
+void show_help_and_exit(char *filename) {
+    printf(
+        "Usage: %s [OPTIONS]\n"
+        "--release \t\tBuild calsen in release mode with -O3 optimization\n"
+        "--no-load-config \tPrevent calsen from the loading the config file\n"
+        "--parser-dir, -p \tSpecify the directory where the parses object file will be stored\n"
+        "--exe-dir, -e \t\tSpecify the directory where the calsen executable will be stored\n"
+        "--config, -c \t\tSpecify the path to the config file\n"
+        "--help \t\t\tShow this message and exit\n",
+        filename);
+    exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char **argv) {
     GO_REBUILD_URSELF(argc, argv);
 
+    int show_help = 0;
     int option_index = 0;
     struct option long_options[] = {
+        {"help", no_argument, &show_help, 1},
         {"release", no_argument, &in_release, 1},
         {"no-load-config", no_argument, &no_load_config, 1},
+        {"parsers-dir", required_argument, 0, 'p'},
+        {"exe-dir", required_argument, 0, 'e'},
         {"config", required_argument, 0, 'c'},
         {0, 0, 0, 0},
     };
 
     char config_path[PATH_MAX] = "./.calsenconfig";
+    char parsers_dir[PATH_MAX] = PARSERS_DIR;
+    char exe_dir[PATH_MAX] = BIN_DIR;
 
     while (1) {
         int c = getopt_long(argc, argv, "c:", long_options, &option_index);
@@ -175,11 +204,18 @@ int main(int argc, char **argv) {
         if (c == -1) break;
         switch (c) {
             case 'c':
-                memset(config_path, 0, PATH_MAX);
                 strcpy(config_path, optarg);
+                break;
+            case 'p':
+                strcpy(parsers_dir, optarg);
+                break;
+            case 'e':
+                strcpy(exe_dir, optarg);
                 break;
         }
     }
+
+    if (show_help == 1) show_help_and_exit(argv[0]);
 
     MKDIRS("build", "out");
     MKDIRS("build", "bin");
@@ -187,7 +223,7 @@ int main(int argc, char **argv) {
     build_src();
     build_src_utils();
     build_src_config(config_path);
-    build_calsen();
-    build_parsers();
+    build_calsen(exe_dir);
+    build_parsers(parsers_dir);
     return EXIT_SUCCESS;
 }

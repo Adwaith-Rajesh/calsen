@@ -126,8 +126,6 @@ int main(int argc, char **argv) {
     int help_val = 0;
     int c;
 
-    config_t *config = get_calsen_config();
-
     String *output_file = NULL;
     String *index_file = NULL;
     String *argv_1_val = NULL;
@@ -191,6 +189,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    config_t *config = get_calsen_config();
     /*
         if the index file or the output file is not specifed then the
         filepath provided in the config file will be used.
