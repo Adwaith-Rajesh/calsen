@@ -1,7 +1,10 @@
+// License: GPL v3 Copyright: 2023, Adwaith Rajesh <adwaithrajesh3180@gmail.com>
+
 #define NOBUILD_IMPLEMENTATION
 #include "nobuild.h"
 
 #include <getopt.h>
+#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +16,7 @@
 #define BIN_DIR "./build/bin"
 
 int in_release = 0;
+int no_load_config = 0;
 
 typedef struct {
     char parser_file_name[20];
@@ -43,10 +47,12 @@ void build_src_utils() {
     });
 }
 
-void build_src_config() {
+void build_src_config(char *config_file_path) {
     INFO("Building src/config");
 
     const char *src_config_dir = "./src/config";
+    char *config_path = JOIN("", "-DCALSENCONFIG=\"", config_file_path, "\"");
+    char *load_config = JOIN("", "-DLOAD_CONFIG=", no_load_config ? "0" : "1");
 
     if (!IS_DIR(src_config_dir)) {
         INFO("provided src/config dir not a dir!\n");
@@ -55,7 +61,11 @@ void build_src_config() {
 
     FOREACH_FILE_IN_DIR(file, src_config_dir, {
         if (ENDS_WITH(file, ".c")) {
-            _build_object_file(file, PATH("src", "config", file));
+            CMD(CC, C_FLAGS, "-o",
+                PATH("build", "out", CONCAT(NOEXT(file), ".o")),
+                "-c",
+                PATH("src", "config", file),
+                config_path, load_config);
         }
     });
 }
@@ -152,17 +162,31 @@ int main(int argc, char **argv) {
     int option_index = 0;
     struct option long_options[] = {
         {"release", no_argument, &in_release, 1},
+        {"no-load-config", no_argument, &no_load_config, 1},
+        {"config", required_argument, 0, 'c'},
         {0, 0, 0, 0},
     };
 
-    int c = getopt_long(argc, argv, "", long_options, &option_index);
+    char config_path[PATH_MAX] = "./.calsenconfig";
+
+    while (1) {
+        int c = getopt_long(argc, argv, "c:", long_options, &option_index);
+
+        if (c == -1) break;
+        switch (c) {
+            case 'c':
+                memset(config_path, 0, PATH_MAX);
+                strcpy(config_path, optarg);
+                break;
+        }
+    }
 
     MKDIRS("build", "out");
     MKDIRS("build", "bin");
     MKDIRS("build", "parsers");
     build_src();
     build_src_utils();
-    build_src_config();
+    build_src_config(config_path);
     build_calsen();
     build_parsers();
     return EXIT_SUCCESS;

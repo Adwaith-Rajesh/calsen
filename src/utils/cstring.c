@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "memfns.h"
 
@@ -79,12 +80,9 @@ void charp_slice_print(CharPSlice *slice) {
 }
 
 void string_reset(String *string) {
-    // we kind of have to remove the null byte that was prev set
-    // might hinder with other standard lib function.
-    // so fo now the best approach is to just replace it with some random character
-    string->str[string->curr_p] = '$';
-    string->curr_p = 0;
+    memset(string->str, 0, string->size);
     string->str[0] = '\0';
+    string->curr_p = 0;
 }
 
 // check if the char can be appended, otherwise create a new string

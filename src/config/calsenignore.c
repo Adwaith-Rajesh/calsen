@@ -45,6 +45,20 @@ LinkedList *parse_ignore_file(const char *filepath) {
 }
 
 static int _check_pattern_match(const char *pattern, const char *str) {
+    if (*pattern == '\0' && *str == '\0') return 1;
+    if (*pattern == '\0') return 0;
+    if (*str == '\0') {
+        if (*pattern != '*') return 0;
+        return _check_pattern_match(pattern + 1, str);
+    }
+    if (*pattern == '?' || *pattern == *str) return _check_pattern_match(pattern + 1, str + 1);
+    if (*pattern == '*') return _check_pattern_match(pattern + 1, str) || _check_pattern_match(pattern, str + 1);
+    return 0;
 }
 
-int check_file_name_is_ignored(LinkedList *patterns, const char *str) {}
+int check_file_name_is_ignored(LinkedList *patterns, const char *str) {
+    for (Node *node = patterns->head; node != NULL; node = node->next) {
+        if (_check_pattern_match(((String *)node->data)->str, str)) return 1;
+    }
+    return 0;
+}

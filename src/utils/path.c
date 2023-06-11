@@ -22,7 +22,8 @@ int is_dir(const char *pathname) {
 char *get_absolute_path(const char *path, char *resolved_path) {
     char *r = realpath(path, resolved_path);
     if (r == NULL) {
-        perror("could not find absolute path");
+        fprintf(stderr, "could not find absolute path of %s : %s\n",
+                path, strerror(errno));
         exit(EXIT_FAILURE);
     }
     return r;
