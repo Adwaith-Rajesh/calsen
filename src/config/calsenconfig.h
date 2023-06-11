@@ -13,8 +13,9 @@ typedef struct {
     char parsers_dir[PATH_MAX];
     char ignore_file[PATH_MAX];
     char config_file[PATH_MAX];
+    char index_file[PATH_MAX];
 } config_t;
 
-config_t get_calsen_config();
+config_t *get_calsen_config();
 
 #endif

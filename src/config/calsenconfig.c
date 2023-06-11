@@ -13,6 +13,7 @@
 // the config file for now is pretty straight forward.
 // this first line will the parsers dir.
 // the second line will be the ignore file path
+// the third line will be the index file
 static int _read_line(FILE *fp, char buf[PATH_MAX]) {
     // reads a line until \n, return the number of bytes read
     int n_bytes = 0;
@@ -48,6 +49,10 @@ static void _parse_config_file(const char *filepath, config_t *c) {
     n_bytes = _read_line(fp, temp_path);
     if (n_bytes == 0) _print_config_error("path to .calsenignore file not specified in the config file %s\n", filepath);
     strcpy(c->ignore_file, get_absolute_path(temp_path, resolved_path));
+
+    n_bytes = _read_line(fp, temp_path);
+    if (n_bytes == 0) _print_config_error("path to index file not specified in the config file %s\n", filepath);
+    strcpy(c->index_file, temp_path);
 }
 
 static void _create_config_file(const char *filepath, config_t *c) {
@@ -57,28 +62,38 @@ static void _create_config_file(const char *filepath, config_t *c) {
 if the config file passed during compilation is "", we will check for the existence
 of ~/.config/calsen/.calsenconfig. If does not exist the file will be crated with default values,
 
-if CALSENIGNORE and CALSEN_PARSER_DIR is present as environment variables the file will not be
+if CALSENIGNORE, CALSEN_PARSER_DIR and CALSEN_INDEX is present as environment variables the file will not be
 parsed
 
 if a filepath was passed during compilation then the file will checked and parsed, if the file
 path is invalid then the program stops instantly.
  */
-config_t get_calsen_config() {
+
+config_t config;  // a simple cache
+int config_set = 0;
+
+config_t *get_calsen_config() {
+    if (config_set) return &config;
+
     char *parsers_dir = getenv("CALSEN_PARSER_DIR");
     char *ignore_file = getenv("CALSENIGNORE");
+    char *index_file = getenv("CALSEN_INDEX");
     char *passed_config = CALSENCONFIG;
 
-    config_t c;
     char resolved_path[PATH_MAX] = {0};
-    strcpy(c.config_file, get_absolute_path(passed_config, resolved_path));
-
-    if (parsers_dir != NULL && ignore_file != NULL) {
-        strcpy(c.parsers_dir, get_absolute_path(parsers_dir, resolved_path));
-        strcpy(c.ignore_file, get_absolute_path(ignore_file, resolved_path));
-        return c;
+    strcpy(config.config_file, get_absolute_path(passed_config, resolved_path));
+    // the absolute path to index cannot be found as the file does not exist
+    // when the calsen runs for the first time
+    if (parsers_dir == NULL || ignore_file != NULL || index_file != NULL) {
+        _parse_config_file(passed_config, &config);
     }
 
-    _parse_config_file(passed_config, &c);
+    if (parsers_dir) strcpy(config.parsers_dir, get_absolute_path(parsers_dir, resolved_path));
+    if (ignore_file) strcpy(config.ignore_file, get_absolute_path(ignore_file, resolved_path));
+    if (index_file) strcpy(config.index_file, index_file);
+    config_set = 1;
+    return &config;
 
-    return c;
+    config_set = 1;
+    return &config;
 }
