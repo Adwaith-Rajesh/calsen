@@ -88,7 +88,7 @@ config_t *get_calsen_config() {
                 "\x1b[36mone of CALSEN_PARSER_DIR, CALSENIGNORE, CALSEN_INDEX "
                 "not set, switching to default values.\n\x1b[0m");
         if (parsers_dir == NULL) strcpy(config.parsers_dir, "./build/parsers");
-        if (ignore_file == NULL) strcpy(config.ignore_file, "./calsenconfig");
+        if (ignore_file == NULL) strcpy(config.ignore_file, "./calsenignore");
         if (index_file == NULL) strcpy(config.index_file, "./calsen.index");
 
         fprintf(stderr, "\x1b[36mCALSEN_PARSER_DIR=%s\nCALSENIGNORE=%s\nCALSEN_INDEX=%s\n\x1b[0m",
