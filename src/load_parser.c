@@ -12,6 +12,7 @@
 #define _GNU_SOURCE
 #include <dlfcn.h>
 
+#include "config/calsenconfig.h"
 #include "cstring.h"
 #include "hash_table.h"
 #include "load_parser.h"
@@ -24,21 +25,18 @@ static void _load_lib_to_table(const char *lib_path, const char *lib_name, HashT
 }
 
 HashTable *load_all_parsers() {
-    char *parser_dir = getenv("CALSEN_PARSER_DIR");
-    if (parser_dir == NULL) parser_dir = "./build/parsers";
+    config_t *config = get_calsen_config();
 
-    char resolved_path[PATH_MAX];
-
-    get_absolute_path(parser_dir, resolved_path);
-    if (!is_dir(resolved_path)) {
-        fprintf(stderr, "'%s' is not a directory\n", resolved_path);
+    char *parsers_dir = config->parsers_dir;
+    if (!is_dir(parsers_dir)) {
+        fprintf(stderr, "'%s' is not a directory\n", parsers_dir);
         exit(EXIT_FAILURE);
     }
 
     // find all the so files in the dir
     // open them, and then store it in a HashTable
     struct dirent *d;
-    DIR *dir = opendir(resolved_path);
+    DIR *dir = opendir(parsers_dir);
 
     if (dir == NULL) {
         perror("Could not open directory");
@@ -52,7 +50,7 @@ HashTable *load_all_parsers() {
         char *dot = strrchr(d->d_name, '.');  // find the last dot(.)
 
         if (dot == NULL) continue;
-        shared_lib_path = string_create_from_charp(resolved_path, PATH_MAX);
+        shared_lib_path = string_create_from_charp(parsers_dir, PATH_MAX);
         if (strcmp(dot, ".so") == 0) {
             string_append_char(shared_lib_path, '/');
             string_append_charp(shared_lib_path, d->d_name);
