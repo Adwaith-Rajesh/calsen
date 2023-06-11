@@ -1,6 +1,7 @@
 #include "calsenignore.h"
 
 #include <errno.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,8 +11,10 @@
 
 LinkedList *g_pattern_list = NULL;  // simple cache
 
-static void _free_string_patter_list(Node *node) {
+static void *_free_string_patter_list(Node *node, va_list args) {
+    (void)args;
     string_destroy((String *)node->data);
+    return NULL;
 }
 
 void drop_pattern_list_cache() {
@@ -53,6 +56,8 @@ LinkedList *parse_ignore_file(const char *filepath) {
         }
         pattern = string_expandable_append(pattern, ch);
     }
+    if (pattern->curr_p != 0) ll_append_left(pattern_list,
+                                             create_node(string_strip(pattern, 0)));
     string_destroy(pattern);
     fclose(fp);
     g_pattern_list = pattern_list;  // set the cache
