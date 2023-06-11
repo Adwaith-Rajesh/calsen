@@ -62,6 +62,11 @@ path is invalid then the program stops instantly
 all the parsed configs can be overriden by env vars, and those can be overriden by the CLI
  */
 
+static void _create_empty_file(const char *filepath) {
+    FILE *fp = fopen(filepath, "w");
+    fclose(fp);
+}
+
 config_t config;  // a simple cache
 int config_set = 0;
 
@@ -87,8 +92,11 @@ config_t *get_calsen_config() {
         fprintf(stderr,
                 "\x1b[36mone of CALSEN_PARSER_DIR, CALSENIGNORE, CALSEN_INDEX "
                 "not set, switching to default values.\n\x1b[0m");
+
+        // create an empty ./.calsenignore file, so the the default path stays valid
+        _create_empty_file("./.calsenignore");
         if (parsers_dir == NULL) strcpy(config.parsers_dir, "./build/parsers");
-        if (ignore_file == NULL) strcpy(config.ignore_file, "./calsenignore");
+        if (ignore_file == NULL) strcpy(config.ignore_file, "./.calsenignore");
         if (index_file == NULL) strcpy(config.index_file, "./calsen.index");
 
         fprintf(stderr, "\x1b[36mCALSEN_PARSER_DIR=%s\nCALSENIGNORE=%s\nCALSEN_INDEX=%s\n\x1b[0m",
