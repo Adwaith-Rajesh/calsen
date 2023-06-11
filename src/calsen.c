@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "config/calsenignore.h"
 #include "cstring.h"
 #include "hash_table.h"
 #include "indexer.h"
@@ -112,6 +113,9 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
     ht_free(parsers);
     ht_free_map(file_tf_table, _tf_table_in_free);
     ht_free(file_tf_table);
+
+    // drop the ignore patter list cache
+    drop_pattern_list_cache();
 }
 
 // =========== Search ===========

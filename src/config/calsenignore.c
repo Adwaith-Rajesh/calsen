@@ -8,8 +8,22 @@
 #include "cstring.h"
 #include "linked_list.h"
 
+LinkedList *g_pattern_list = NULL;  // simple cache
+
+static void _free_string_patter_list(Node *node) {
+    string_destroy((String *)node->data);
+}
+
+void drop_pattern_list_cache() {
+    ll_map(g_pattern_list, _free_string_patter_list);
+    ll_free(g_pattern_list);
+    g_pattern_list = NULL;
+}
+
 // returns: LikedList[String]  i.e. a linked list of patterns to match
 LinkedList *parse_ignore_file(const char *filepath) {
+    if (g_pattern_list != NULL) return g_pattern_list;
+
     FILE *fp = fopen(filepath, "r");
 
     if (fp == NULL) {
@@ -41,6 +55,7 @@ LinkedList *parse_ignore_file(const char *filepath) {
     }
     string_destroy(pattern);
     fclose(fp);
+    g_pattern_list = pattern_list;  // set the cache
     return pattern_list;
 }
 
