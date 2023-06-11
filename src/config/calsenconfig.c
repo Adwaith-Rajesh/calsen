@@ -80,13 +80,16 @@ config_t *get_calsen_config() {
     // the absolute path to index cannot be found as the file does not exist
     // when the calsen runs for the first time
     if (LOAD_CONFIG && (parsers_dir == NULL || ignore_file == NULL || index_file == NULL)) {
-        printf("in load config\n");
         _parse_config_file(passed_config, &config);
     }
 
     if (!LOAD_CONFIG && (parsers_dir == NULL || ignore_file == NULL || index_file == NULL)) {
-        fprintf(stderr, "CALSEN_PARSER_DIR, CALSENIGNORE, CALSEN_INDEX, must be set as env variables.\n");
-        exit(EXIT_FAILURE);
+        fprintf(stderr,
+                "\x1b[36mone of CALSEN_PARSER_DIR, CALSENIGNORE, CALSEN_INDEX,"
+                "not set switching to default values.\n\x1b[0m");
+        if (parsers_dir == NULL) strcpy(config.parsers_dir, "./build/parsers");
+        if (ignore_file == NULL) strcpy(config.ignore_file, "./calsenconfig");
+        if (index_file == NULL) strcpy(config.index_file, "./calsen.index");
     }
 
     if (parsers_dir) strcpy(config.parsers_dir, get_absolute_path(parsers_dir, resolved_path));
