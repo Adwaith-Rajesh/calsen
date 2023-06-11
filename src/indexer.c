@@ -30,6 +30,8 @@ token1=0.444
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "config/calsenconfig.h"
+#include "config/calsenignore.h"
 #include "cstring.h"
 #include "hash_table.h"
 #include "linked_list.h"
@@ -78,8 +80,13 @@ Returns:
     LinkedList[FileWithMIME *];
 */
 void get_files_to_index(char *dirpath, LinkedList *list) {
-    char resolved_path[PATH_MAX];
+    char resolved_path[PATH_MAX] = {0};
     char *dir_full_path = get_absolute_path(dirpath, resolved_path);
+
+    LinkedList *ignore_list = parse_ignore_file(get_calsen_config()->ignore_file);
+
+    // check whether the dir is ignored
+    if (check_file_name_is_ignored(ignore_list, dir_full_path)) return;
 
     DIR *dir;
     struct dirent *entry;
@@ -88,6 +95,8 @@ void get_files_to_index(char *dirpath, LinkedList *list) {
     while ((entry = readdir(dir)) != NULL) {
         char full_file_path[PATH_MAX];
         snprintf(full_file_path, PATH_MAX, "%s/%s", dir_full_path, entry->d_name);
+
+        if (check_file_name_is_ignored(ignore_list, full_file_path)) continue;
 
         if (is_dir(full_file_path)) {
             if ((strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0)) continue;
