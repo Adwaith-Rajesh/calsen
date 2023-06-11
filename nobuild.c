@@ -16,6 +16,7 @@
 #define BIN_DIR "./build/bin"
 
 int in_release = 0;
+int no_load_config = 0;
 
 typedef struct {
     char parser_file_name[20];
@@ -51,6 +52,7 @@ void build_src_config(char *config_file_path) {
 
     const char *src_config_dir = "./src/config";
     char *config_path = JOIN("", "-DCALSENCONFIG=\"", config_file_path, "\"");
+    char *load_config = JOIN("", "-DLOAD_CONFIG=", no_load_config ? "0" : "1");
 
     if (!IS_DIR(src_config_dir)) {
         INFO("provided src/config dir not a dir!\n");
@@ -63,7 +65,7 @@ void build_src_config(char *config_file_path) {
                 PATH("build", "out", CONCAT(NOEXT(file), ".o")),
                 "-c",
                 PATH("src", "config", file),
-                config_path);
+                config_path, load_config);
         }
     });
 }
@@ -160,6 +162,7 @@ int main(int argc, char **argv) {
     int option_index = 0;
     struct option long_options[] = {
         {"release", no_argument, &in_release, 1},
+        {"no-load-config", no_argument, &no_load_config, 1},
         {"config", required_argument, 0, 'c'},
         {0, 0, 0, 0},
     };

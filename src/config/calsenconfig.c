@@ -53,6 +53,7 @@ static void _parse_config_file(const char *filepath, config_t *c) {
     n_bytes = _read_line(fp, temp_path);
     if (n_bytes == 0) _print_config_error("path to index file not specified in the config file %s\n", filepath);
     strcpy(c->index_file, temp_path);
+    fclose(fp);
 }
 
 static void _create_config_file(const char *filepath, config_t *c) {
@@ -81,19 +82,24 @@ config_t *get_calsen_config() {
     char *passed_config = CALSENCONFIG;
 
     char resolved_path[PATH_MAX] = {0};
-    strcpy(config.config_file, get_absolute_path(passed_config, resolved_path));
+
+    if (LOAD_CONFIG)
+        strcpy(config.config_file, get_absolute_path(passed_config, resolved_path));
     // the absolute path to index cannot be found as the file does not exist
     // when the calsen runs for the first time
-    if (parsers_dir == NULL || ignore_file != NULL || index_file != NULL) {
+    if (LOAD_CONFIG && (parsers_dir == NULL || ignore_file == NULL || index_file == NULL)) {
+        printf("in load config\n");
         _parse_config_file(passed_config, &config);
+    }
+
+    if (!LOAD_CONFIG && (parsers_dir == NULL || ignore_file == NULL || index_file == NULL)) {
+        fprintf(stderr, "CALSEN_PARSER_DIR, CALSENIGNORE, CALSEN_INDEX, must be set as env variables.\n");
+        exit(EXIT_FAILURE);
     }
 
     if (parsers_dir) strcpy(config.parsers_dir, get_absolute_path(parsers_dir, resolved_path));
     if (ignore_file) strcpy(config.ignore_file, get_absolute_path(ignore_file, resolved_path));
     if (index_file) strcpy(config.index_file, index_file);
-    config_set = 1;
-    return &config;
-
     config_set = 1;
     return &config;
 }

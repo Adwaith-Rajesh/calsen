@@ -9,6 +9,10 @@
 #define CALSENCONFIG "./calsenconfig"
 #endif
 
+#ifndef LOAD_CONFIG
+#define LOAD_CONFIG 1
+#endif
+
 typedef struct {
     char parsers_dir[PATH_MAX];
     char ignore_file[PATH_MAX];
