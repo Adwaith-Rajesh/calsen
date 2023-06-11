@@ -73,6 +73,34 @@ void *ht_get(HashTable *table, const char *key) {
     return NULL;
 }
 
+void *ht_drop(HashTable *table, const char *key) {
+    unsigned int slot = _hash(key);
+    HTEntry *entry = table->entries[slot];
+
+    if (entry == NULL) return NULL;
+
+    HTEntry *prev = NULL;
+    while (entry != NULL) {
+        if (strcmp(entry->key, key) == 0) {
+            HTEntry *temp = entry;
+            if (entry->next == NULL && prev == NULL) {
+                table->entries[slot] = NULL;
+            } else if (entry->next != NULL && prev == NULL) {
+                table->entries[slot] = entry->next;
+            } else if (entry->next != NULL && prev != NULL) {
+                prev->next = entry->next;
+            }
+            free(temp->key);
+            void *val = temp->value;
+            free(temp);
+            return val;
+        }
+        prev = entry;
+        entry = entry->next;
+    }
+    return NULL;
+}
+
 void ht_free(HashTable *table) {
     if (table == NULL) return;
 
@@ -99,6 +127,7 @@ void ht_free_map(HashTable *table, HtFreeMapFn *fn) {
         if (entry != NULL) {
             while (entry != NULL) {
                 fn(entry->value);
+                entry->value = NULL;
                 entry = entry->next;
             }
         }

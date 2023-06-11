@@ -23,6 +23,7 @@ typedef void HtEntryMapFn(HTEntry *, va_list);
 HashTable *ht_create(void);
 void ht_set(HashTable *table, const char *key, void *value);
 void *ht_get(HashTable *table, const char *key);
+void *ht_drop(HashTable *table, const char *key);
 void ht_free(HashTable *table);
 // allows you to free the keys before the table itself get freed
 void ht_free_map(HashTable *table, HtFreeMapFn *fn);
