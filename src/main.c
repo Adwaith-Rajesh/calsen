@@ -24,8 +24,10 @@ Calsen. A search engine for files
 #include <string.h>
 
 #include "calsen.h"
+#include "config/calsenconfig.h"
 #include "cstring.h"
 #include "linked_list.h"
+#include "path.h"
 #include "tf_idf.h"
 
 int verbose_flag;
@@ -86,6 +88,7 @@ void print_help(FILE *stream, int type, char *filename) {
         "--output, -o \tThe file to output the indexed data to.\n"
         "--verbose, -v \tGet verbose output.\n"
         "--dir, -d \tThe directories to find the files to index.\n"
+        "--ignore, -g \tPath to the ignore file, overrides the config file"
         "--help, -h \tShow this message and quit.\n";
     char *search_usage =
         "Usage: %s search [OPTIONS]\n"
@@ -123,10 +126,13 @@ int main(int argc, char **argv) {
     int help_val = 0;
     int c;
 
+    config_t *config = get_calsen_config();
+
     String *output_file = NULL;
     String *index_file = NULL;
     String *argv_1_val = NULL;
     String *query = NULL;
+    String *ignore_file = NULL;
     LinkedList *dir_list = NULL;
     int n_results = 0;
 
@@ -138,6 +144,7 @@ int main(int argc, char **argv) {
         {"dir", required_argument, 0, 'd'},
         {"query", required_argument, 0, 'q'},
         {"number", optional_argument, 0, 'n'},
+        {"ignore", required_argument, 0, 'g'},
         {0, 0, 0, 0},
     };
 
@@ -148,7 +155,7 @@ int main(int argc, char **argv) {
 
     while (1) {
         int options_index = 0;
-        c = getopt_long(argc, argv, "o:i:d:q:n:", long_options, &options_index);
+        c = getopt_long(argc, argv, "o:i:d:q:n:g:", long_options, &options_index);
 
         if (c == -1) break;
 
@@ -167,6 +174,10 @@ int main(int argc, char **argv) {
                 break;
             case 'n':
                 n_results = atoi(optarg);
+                break;
+            case 'g':
+                ignore_file = string_create_from_charp(optarg, strlen(optarg));
+                break;
         }
     }
 
@@ -180,9 +191,33 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    /*
+        if the index file or the output file is not specifed then the
+        filepath provided in the config file will be used.
+        if the index file or the output file is specifed then the index file
+        path specified in the config file will be ignored and replaced
+    */
+
+    if (index_file == NULL) {
+        index_file = string_create_from_charp(config->index_file, strlen(config->index_file));
+    } else {
+        strcpy(config->index_file, index_file->str);
+    }
+
+    if (output_file == NULL) {
+        output_file = string_create_from_charp(config->index_file, strlen(config->index_file));
+    } else {
+        strcpy(config->index_file, output_file->str);
+    }
+
+    if (ignore_file != NULL) {
+        char resolved_path[PATH_MAX];
+        strcpy(config->ignore_file, get_absolute_path(ignore_file->str, resolved_path));
+    }
+
     if (strcmp("reindex", argv_1_val->str) == 0) {
         if ((dir_list == NULL) || (output_file == NULL)) {
-            fprintf(stderr, "reindex: missing one of --dir, --output\n");
+            fprintf(stderr, "reindex: missing one of --dir, --index\n");
             print_help(stderr, 2, argv[0]);
             exit(1);
         }
@@ -193,7 +228,7 @@ int main(int argc, char **argv) {
 
     if (strcmp("search", argv_1_val->str) == 0) {
         if ((query == NULL) || (index_file == NULL)) {
-            fprintf(stderr, "search: missing one of --query, --index\n");
+            fprintf(stderr, "search: missing one of --query, --output");
             print_help(stderr, 3, argv[0]);
             exit(1);
         }
@@ -209,6 +244,7 @@ int main(int argc, char **argv) {
     string_destroy(index_file);
     string_destroy(argv_1_val);
     string_destroy(query);
+    string_destroy(ignore_file);
 
     return 0;
 }
