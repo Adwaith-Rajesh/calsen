@@ -63,7 +63,7 @@ all the parsed configs can be overriden by env vars, and those can be overriden 
  */
 
 static void _create_empty_file(const char *filepath) {
-    FILE *fp = fopen(filepath, "w");
+    FILE *fp = fopen(filepath, "ab+");
     fclose(fp);
 }
 
