@@ -30,6 +30,8 @@ Calsen. A search engine for files
 #include "path.h"
 #include "tf_idf.h"
 
+#define VERSION "v0.2.0"
+
 int verbose_flag;
 
 static LinkedList *_ll_check_null_add(LinkedList *list, char *dirname) {
@@ -80,23 +82,24 @@ static void *_ll_free_file_tf_idf_map(Node *node, va_list args) {
 
 void print_help(FILE *stream, int type, char *filename) {
     char *simple_usage =
-        "Usage: %s <search/reindex> [OPTIONS]\n"
-        "--help, -h \tShow this message and quit.\n";
+        "Usage: %s <search/reindex> [OPTIONS]\n\n"
+        "   --version \tPrint version and license\n"
+        "   --help, -h \tShow this message and quit.\n";
 
     char *reindex_usage =
-        "Usage: %s reindex [OPTIONS]\n"
-        "--output, -o \tThe file to output the indexed data to.\n"
-        "--verbose, -v \tGet verbose output.\n"
-        "--dir, -d \tThe directories to find the files to index.\n"
-        "--ignore, -g \tPath to the ignore file, overrides the config file"
-        "--help, -h \tShow this message and quit.\n";
+        "Usage: %s reindex [OPTIONS]\n\n"
+        "   --output, -o \tThe file to output the indexed data to.\n"
+        "   --verbose, -v \tGet verbose output.\n"
+        "   --dir, -d \tThe directories to find the files to index.\n"
+        "   --ignore, -g \tPath to the ignore file, overrides the config file\n"
+        "   --help, -h \tShow this message and quit.\n";
     char *search_usage =
-        "Usage: %s search [OPTIONS]\n"
-        "--index, -i \tThe file that contains the indexed data.\n"
-        "--query, -q \tThe query to search.\n"
-        "--verbose, -v \tGet verbose output.\n"
-        "--number, -n \tNumber of results required."
-        "--help, -h \tShow this message and quit.\n";
+        "Usage: %s search [OPTIONS]\n\n"
+        "   --index, -i \tThe file that contains the indexed data.\n"
+        "   --query, -q \tThe query to search.\n"
+        "   --verbose, -v \tGet verbose output.\n"
+        "   --number, -n \tNumber of results required.\n"
+        "   --help, -h \tShow this message and quit.\n";
 
     switch (type) {
         case 2:
@@ -109,6 +112,24 @@ void print_help(FILE *stream, int type, char *filename) {
             fprintf(stream, simple_usage, filename);
             break;
     }
+}
+
+void print_version() {
+    printf(
+        "calsen " VERSION
+        "\nCopyright (C) 2023 Adwaith Rajesh\n\n"
+        "This program is free software: you can redistribute it and/or modify\n"
+        "it under the terms of the GNU General Public License as published by\n"
+        "the Free Software Foundation, either version 3 of the License, or\n"
+        "(at your option) any later version.\n\n"
+
+        "This program is distributed in the hope that it will be useful,\n"
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+        "GNU General Public License for more details.\n"
+
+    );
+    exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char **argv) {
@@ -124,6 +145,7 @@ int main(int argc, char **argv) {
     //      reindex
     //      search
     int help_val = 0;
+    int show_version = 0;
     int c;
 
     String *output_file = NULL;
@@ -135,6 +157,7 @@ int main(int argc, char **argv) {
     int n_results = 0;
 
     struct option long_options[] = {
+        {"version", no_argument, &show_version, 1},
         {"verbose", no_argument, &verbose_flag, 1},
         {"help", no_argument, &help_val, 1},
         {"output", required_argument, 0, 'o'},
@@ -179,6 +202,8 @@ int main(int argc, char **argv) {
         }
     }
 
+    if (show_version == 1) print_version();
+
     if (argc <= 2 && help_val) {
         print_help(stdout, 1, argv[0]);
         exit(0);
@@ -216,7 +241,8 @@ int main(int argc, char **argv) {
 
     if (strcmp("reindex", argv_1_val->str) == 0) {
         if ((dir_list == NULL) || (output_file == NULL)) {
-            fprintf(stderr, "reindex: missing one of --dir, --index\n");
+            if (!help_val)
+                fprintf(stderr, "reindex: missing one of --dir, --index\n");
             print_help(stderr, 2, argv[0]);
             exit(1);
         }
@@ -227,7 +253,8 @@ int main(int argc, char **argv) {
 
     if (strcmp("search", argv_1_val->str) == 0) {
         if ((query == NULL) || (index_file == NULL)) {
-            fprintf(stderr, "search: missing one of --query, --output");
+            if (!help_val)
+                fprintf(stderr, "search: missing one of --query, --output\n");
             print_help(stderr, 3, argv[0]);
             exit(1);
         }
