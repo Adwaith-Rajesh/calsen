@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "config/calsenignore.h"
 #include "cstring.h"
 #include "hash_table.h"
 #include "indexer.h"
@@ -50,13 +51,11 @@ static void _tf_table_in_free(void *ht) {
 }
 
 static void *_index_one_file(Node *node, va_list args) {
-    va_list args_copy;
-    va_copy(args_copy, args);
-
     FileWithMIME *fwm = (FileWithMIME *)node->data;
-    HashTable *parsers = va_arg(args_copy, HashTable *);
-    HashTable *tf_table = va_arg(args_copy, HashTable *);
+    HashTable *parsers = va_arg(args, HashTable *);
+    HashTable *tf_table = va_arg(args, HashTable *);
     ParseFileFn *parse_fn = load_parser_entry_point(parsers, fwm->mime_type->str);
+
     if (parse_fn == NULL) return NULL;
     String *file_contents = string_create(get_file_size(fwm->filepath->str));
     parse_fn(fwm->filepath->str, file_contents);
@@ -108,10 +107,16 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
     ll_map(dir_list, _index_one_dir, parsers, file_tf_table);
 
     dump_index(output_file, file_tf_table);
+
+    ht_drop(parsers, "text_x-c.so");
+    ht_drop(parsers, "text_x-java.so");
     ht_free_map(parsers, unload_parser);
     ht_free(parsers);
     ht_free_map(file_tf_table, _tf_table_in_free);
     ht_free(file_tf_table);
+
+    // drop the ignore pattern list cache
+    drop_pattern_list_cache();
 }
 
 // =========== Search ===========

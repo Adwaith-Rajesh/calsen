@@ -30,6 +30,8 @@ token1=0.444
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "config/calsenconfig.h"
+#include "config/calsenignore.h"
 #include "cstring.h"
 #include "hash_table.h"
 #include "linked_list.h"
@@ -78,8 +80,13 @@ Returns:
     LinkedList[FileWithMIME *];
 */
 void get_files_to_index(char *dirpath, LinkedList *list) {
-    char resolved_path[PATH_MAX];
+    char resolved_path[PATH_MAX] = {0};
     char *dir_full_path = get_absolute_path(dirpath, resolved_path);
+
+    LinkedList *ignore_list = parse_ignore_file(get_calsen_config()->ignore_file);
+
+    // check whether the dir is ignored
+    if (check_file_name_is_ignored(ignore_list, dir_full_path)) return;
 
     DIR *dir;
     struct dirent *entry;
@@ -88,6 +95,8 @@ void get_files_to_index(char *dirpath, LinkedList *list) {
     while ((entry = readdir(dir)) != NULL) {
         char full_file_path[PATH_MAX];
         snprintf(full_file_path, PATH_MAX, "%s/%s", dir_full_path, entry->d_name);
+
+        if (check_file_name_is_ignored(ignore_list, full_file_path)) continue;
 
         if (is_dir(full_file_path)) {
             if ((strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0)) continue;
@@ -129,20 +138,6 @@ key, "points" to another hash table where each key is token with its tf value
 
 /* =============== Load the contents from the file =============== */
 
-// check if the char can be appended, otherwise create a new string
-// with double the size. It' static as indexer might be the only place where this is needed
-static String *_string_expandable_append(String *str, char c) {
-    if (str->curr_p < str->size - 1) {
-        string_append_char(str, c);
-        return str;
-    } else {
-        String *new_string = string_create_from_charp(str->str, str->size * 2);
-        string_destroy(str);
-        return new_string;
-    }
-    return NULL;
-}
-
 static HashTable *_read_token(FILE *fp) {
     HashTable *token_table = ht_create();
     int ch;
@@ -152,9 +147,9 @@ static HashTable *_read_token(FILE *fp) {
     while ((ch = fgetc(fp)) != ':' && ch != EOF) {
         // read the token name
         String *token_line = string_create(20);
-        token_line = _string_expandable_append(token_line, ch);
+        token_line = string_expandable_append(token_line, ch);
         while ((ch = fgetc(fp)) != '=' && ch != EOF) {
-            token_line = _string_expandable_append(token_line, ch);
+            token_line = string_expandable_append(token_line, ch);
         }
 
         // read the TF val (14 bytes, after the '=')
@@ -190,7 +185,7 @@ HashTable *load_index(const char *index_file) {
             fseek(fp, 9, SEEK_CUR);
             // now we read the filename
             while ((ch = fgetc(fp)) != EOF && ch != '\n') {
-                line = _string_expandable_append(line, ch);
+                line = string_expandable_append(line, ch);
             }
             ht_set(index_table, line->str, NULL);
 

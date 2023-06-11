@@ -1,14 +1,18 @@
 #include "cstring.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "memfns.h"
 
 String *string_create(size_t size) {
     if (size < 1) return NULL;
     String *new_string;
 
-    new_string = malloc(sizeof(String));
-    new_string->str = malloc(sizeof(char) * size);
+    new_string = malloc_with_check(sizeof(String));
+    new_string->str = malloc_with_check(sizeof(char) * size);
 
     new_string->str[0] = '\0';
     new_string->curr_p = 0;
@@ -76,10 +80,42 @@ void charp_slice_print(CharPSlice *slice) {
 }
 
 void string_reset(String *string) {
-    // we kind of have to remove the null byte that was prev set
-    // might hinder with other standard lib function.
-    // so fo now the best approach is to just replace it with some random character
-    string->str[string->curr_p] = '$';
-    string->curr_p = 0;
+    memset(string->str, 0, string->size);
     string->str[0] = '\0';
+    string->curr_p = 0;
+}
+
+// check if the char can be appended, otherwise create a new string
+// with double the size. It' static as indexer might be the only place where this is needed
+String *string_expandable_append(String *str, char c) {
+    if (str->curr_p < str->size - 1) {
+        string_append_char(str, c);
+        return str;
+    } else {
+        String *new_string = string_create_from_charp(str->str, str->size * 2);
+        string_destroy(str);
+        return new_string;
+    }
+    return NULL;
+}
+
+String *string_strip(String *string, int destroy_prev) {
+    String *new_string = string_create(string->size);
+
+    if (string->size == 0) {
+        if (destroy_prev == 1) string_destroy(string);
+        return new_string;  // we always return a new string
+    }
+
+    size_t start_idx = 0;
+    size_t end_idx = string->curr_p - 1;
+    while (start_idx < string->size && isspace(string->str[start_idx])) start_idx++;  // removes the leading whitespaces
+    while (end_idx >= start_idx && isspace(string->str[end_idx])) end_idx--;
+
+    for (size_t i = start_idx; i <= end_idx; i++) {
+        string_append_char(new_string, string->str[i]);
+    }
+
+    if (destroy_prev == 1) string_destroy(string);
+    return new_string;
 }

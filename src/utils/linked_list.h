@@ -21,22 +21,22 @@ typedef struct {
 typedef void NodePrinterFn(Node *);
 typedef void *LinkedListMapFn(Node *, va_list);
 
-Node *create_node(void *);
-void free_node(Node *);
+Node *create_node(void *data);
+void free_node(Node *node);
 
 LinkedList *ll_init();
-void ll_print(LinkedList *, NodePrinterFn *);
-int ll_is_empty(LinkedList *);
-void ll_append(LinkedList *, Node *);
-Node *ll_pop(LinkedList *);
-void ll_append_left(LinkedList *, Node *);
-Node *ll_pop_left(LinkedList *);
-void ll_map(LinkedList *, LinkedListMapFn *, ...);
-void ll_empty(LinkedList *);
-void ll_free(LinkedList *);
+void ll_print(LinkedList *list, NodePrinterFn *node_printer);
+int ll_is_empty(LinkedList *list);
+void ll_append(LinkedList *list, Node *node);
+Node *ll_pop(LinkedList *list);
+void ll_append_left(LinkedList *list, Node *node);
+Node *ll_pop_left(LinkedList *list);
+void ll_map(LinkedList *list, LinkedListMapFn *fn, ...);
+void ll_empty(LinkedList *list);
+void ll_free(LinkedList *list);
 
-LLIter *ll_iter_init(LinkedList *);
-void ll_iter_free(LLIter *);
-Node *ll_iter_next(LLIter *);
+LLIter *ll_iter_init(LinkedList *list);
+void ll_iter_free(LLIter *iterator);
+Node *ll_iter_next(LLIter *iterator);
 
 #endif

@@ -59,5 +59,7 @@ out/
 .vscode/
 nobuild
 nobuild.old
-sample.index
+*.index
 calsen
+.calsenignore
+.calsenconfig

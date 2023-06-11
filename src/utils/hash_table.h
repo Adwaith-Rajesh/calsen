@@ -20,14 +20,14 @@ typedef void HtFreeMapFn(void *);
 typedef void HTValuePrintFn(void *);
 typedef void HtEntryMapFn(HTEntry *, va_list);
 
-HashTable *
-ht_create(void);
-void ht_set(HashTable *, const char *, void *);
-void *ht_get(HashTable *, const char *);
-void ht_free(HashTable *);
+HashTable *ht_create(void);
+void ht_set(HashTable *table, const char *key, void *value);
+void *ht_get(HashTable *table, const char *key);
+void *ht_drop(HashTable *table, const char *key);
+void ht_free(HashTable *table);
 // allows you to free the keys before the table itself get freed
-void ht_free_map(HashTable *, HtFreeMapFn *);
-void ht_print(HashTable *, HTValuePrintFn *);
-void ht_entry_map(HashTable *, HtEntryMapFn *, ...);
-size_t ht_get_size(HashTable *);
+void ht_free_map(HashTable *table, HtFreeMapFn *fn);
+void ht_print(HashTable *table, HTValuePrintFn *fn);
+void ht_entry_map(HashTable *table, HtEntryMapFn *fn, ...);
+size_t ht_get_size(HashTable *table);
 #endif
