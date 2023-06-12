@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
     char exe_dir[PATH_MAX] = BIN_DIR;
 
     while (1) {
-        int c = getopt_long(argc, argv, "c:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "c:p:e:", long_options, &option_index);
 
         if (c == -1) break;
         switch (c) {
