@@ -103,6 +103,7 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
     // text/plain parsers can also parse text/x-c and text/java
     ht_set(parsers, "text_x-c.so", ht_get(parsers, "text_plain.so"));
     ht_set(parsers, "text_x-java.so", ht_get(parsers, "text_plain.so"));
+    ht_set(parsers, "text_x-script.python.so", ht_get(parsers, "text_plain.so"));
 
     ll_map(dir_list, _index_one_dir, parsers, file_tf_table);
 
@@ -110,6 +111,7 @@ void calsen_index_files(LinkedList *dir_list, const char *output_file) {
 
     ht_drop(parsers, "text_x-c.so");
     ht_drop(parsers, "text_x-java.so");
+    ht_drop(parsers, "text_x-script.python.so");
     ht_free_map(parsers, unload_parser);
     ht_free(parsers);
     ht_free_map(file_tf_table, _tf_table_in_free);
