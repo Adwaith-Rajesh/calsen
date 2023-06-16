@@ -26,6 +26,7 @@ Calsen. A search engine for files
 #include "calsen.h"
 #include "config/calsenconfig.h"
 #include "cstring.h"
+#include "debug/debug.h"
 #include "linked_list.h"
 #include "path.h"
 #include "tf_idf.h"
@@ -246,9 +247,11 @@ int main(int argc, char **argv) {
             print_help(stderr, 2, argv[0]);
             exit(1);
         }
+        log_info("Indexing files\n", NULL);
         calsen_index_files(dir_list, output_file->str);
         ll_map(dir_list, _ll_string_destroy);
         ll_free(dir_list);
+        log_info("Finished Indexing files\n", NULL);
     }
 
     if (strcmp("search", argv_1_val->str) == 0) {

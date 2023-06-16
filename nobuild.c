@@ -10,7 +10,8 @@
 #include <string.h>
 
 #define CC "cc"  // use the default compiler to compile the code
-#define C_FLAGS (in_release) ? "-O3" : "-g", "-Wall", "-Wextra", "-std=c11", "-I./src", "-I./src/utils"
+#define C_FLAGS (in_release) ? "-O3" : "-g", "-Wall", "-Wextra", "-std=c11", "-I./src", "-I./src/utils", \
+                (in_release) ? "-DDEBUG=0" : "-DDEBUG=1"
 
 #define OUT_DIR "./build/out"
 #define BIN_DIR "./build/bin"
@@ -29,6 +30,23 @@ static void _build_object_file(const char *file, const char *o_path) {
         PATH("build", "out", CONCAT(NOEXT(file), ".o")),
         "-c",
         o_path);
+}
+
+void build_debug_tool() {
+    INFO("Building src/debug");
+
+    const char *src_debug = "./src/debug";
+
+    if (!IS_DIR(src_debug)) {
+        INFO("provided src debug dir not a dir!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    FOREACH_FILE_IN_DIR(file, src_debug, {
+        if (ENDS_WITH(file, ".c")) {
+            _build_object_file(file, PATH("src", "debug", file));
+        }
+    });
 }
 
 void build_src_utils() {
@@ -100,6 +118,7 @@ void build_calsen(char *exe_dir) {
                                       NULL);
     FOREACH_FILE_IN_DIR(file, OUT_DIR, {
         if (ENDS_WITH(file, ".o")) {
+            if (ENDS_WITH(file, "debug.o") && in_release) continue;  // the macro expands to a for loop
             line = cstr_array_append(line, PATH(OUT_DIR, file));
         }
     });
@@ -171,7 +190,7 @@ void show_help_and_exit(char *filename) {
         "Usage: %s [OPTIONS]\n"
         "--release \t\tBuild calsen in release mode with -O3 optimization\n"
         "--no-load-config \tPrevent calsen from the loading the config file\n"
-        "--parser-dir, -p \tSpecify the directory where the parses object file will be stored\n"
+        "--parser-dir, -p \tSpecify the directory where the parsed object file will be stored\n"
         "--exe-dir, -e \t\tSpecify the directory where the calsen executable will be stored\n"
         "--config, -c \t\tSpecify the path to the config file\n"
         "--help \t\t\tShow this message and exit\n",
@@ -224,6 +243,7 @@ int main(int argc, char **argv) {
     build_src_utils();
     build_src_config(config_path);
     build_calsen(exe_dir);
+    build_debug_tool();
     build_parsers(parsers_dir);
     return EXIT_SUCCESS;
 }
