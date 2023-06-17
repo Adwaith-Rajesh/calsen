@@ -190,6 +190,7 @@ void show_help_and_exit(char *filename) {
         "Usage: %s [OPTIONS]\n"
         "--release \t\tBuild calsen in release mode with -O3 optimization\n"
         "--no-load-config \tPrevent calsen from the loading the config file\n"
+        "--clean \t\tClean all the output files that were created\n"
         "--parser-dir, -p \tSpecify the directory where the parsed object file will be stored\n"
         "--exe-dir, -e \t\tSpecify the directory where the calsen executable will be stored\n"
         "--config, -c \t\tSpecify the path to the config file\n"
@@ -198,15 +199,24 @@ void show_help_and_exit(char *filename) {
     exit(EXIT_SUCCESS);
 }
 
+void rm_build_files() {
+    INFO("Cleaning build files");
+    RM(OUT_DIR);
+    RM(BIN_DIR);
+}
+
 int main(int argc, char **argv) {
     GO_REBUILD_URSELF(argc, argv);
 
     int show_help = 0;
     int option_index = 0;
+    int clean_build_files = 0;
+
     struct option long_options[] = {
         {"help", no_argument, &show_help, 1},
         {"release", no_argument, &in_release, 1},
         {"no-load-config", no_argument, &no_load_config, 1},
+        {"clean", no_argument, &clean_build_files, 1},
         {"parsers-dir", required_argument, 0, 'p'},
         {"exe-dir", required_argument, 0, 'e'},
         {"config", required_argument, 0, 'c'},
@@ -242,8 +252,11 @@ int main(int argc, char **argv) {
     build_src();
     build_src_utils();
     build_src_config(config_path);
-    build_calsen(exe_dir);
     build_debug_tool();
+    build_calsen(exe_dir);
     build_parsers(parsers_dir);
+
+    if (clean_build_files == 1) rm_build_files();
+
     return EXIT_SUCCESS;
 }
