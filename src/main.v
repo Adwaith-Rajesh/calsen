@@ -20,6 +20,7 @@ module main
 
 import cli { Command, Flag }
 import config { parse_config_file }
+import indexer { get_files_to_index }
 import os
 
 fn call_calsen_search(cmd Command) ! {
@@ -38,6 +39,9 @@ fn call_calsen_reindex(cmd Command) ! {
 fn debug_stuff() {
 	c := parse_config_file('./tmp/.calsenconfig')
 	println(c.init.config.index_dir)
+	println('file_list')
+	f_list := get_files_to_index(['./src', './tmp', '/tmp/code_test/calsen-main'])
+	println(f_list)
 }
 
 fn main() {
