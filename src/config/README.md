@@ -1,29 +1,19 @@
 ## The `.calsenconfig` file
 
 Unlike the previous version of calsen where the configs where separated into different
-files, here all the config will be in one file
+files, here all the config will be in one JSON file
 
 ### A sample config file
 
-```txt
-INIT: {
-    CONFIG: {
-        index_dir: /path/to/index/dir   # dir where all the indexes will be stored
-        # if not provided then the dir where the config file is stored will be used.
-
-    }
-
-    IGNORE: {
-        *venv*
-        *env*
-        *node_modules*  # ignores anything that contains `node_modules`
-    }
+```json
+{
+  "init": {
+    "config": {
+      "index_dir": "/path/to/index/dir"
+    },
+    "ignore": ["*venv*", "*env*", "*node_modules*"]
+  }
 }
-
-QUERY: {
-    # WIP
-}
-
 ```
 
 ### Wildcard matching in ignore section
