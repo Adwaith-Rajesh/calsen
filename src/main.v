@@ -18,6 +18,50 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module main
 
+import cli { Command, Flag }
+import os
+
+fn call_calsen_search(cmd Command) ! {
+	indexes := cmd.flags.get_strings('index')!
+	query := cmd.flags.get_string('query')!
+	search_files(query, indexes)
+}
+
 fn main() {
-	println('Hello World!')
+	// search command
+	mut search_sub_command := Command{
+		name: 'search'
+		description: 'search the indexed files.'
+		execute: call_calsen_search
+	}
+
+	search_sub_command.add_flag(Flag{
+		flag: .string
+		name: 'query'
+		abbrev: 'q'
+		required: true
+		description: 'The query to search the files.'
+	})
+
+	search_sub_command.add_flag(Flag{
+		flag: .string_array
+		name: 'index'
+		abbrev: 'i'
+		required: false
+		default_value: ['default']
+		description: 'The index to use.'
+	})
+
+	// end search subcommand
+
+	mut app := Command{
+		name: 'calsen'
+		description: 'A search engine for files.'
+		commands: [
+			search_sub_command,
+		]
+	}
+
+	app.setup()
+	app.parse(os.args)
 }
