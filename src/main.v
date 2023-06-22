@@ -27,6 +27,12 @@ fn call_calsen_search(cmd Command) ! {
 	search_files(query, indexes)
 }
 
+fn call_calsen_reindex(cmd Command) ! {
+	dir_list := cmd.flags.get_strings('dir')!
+	index := cmd.flags.get_string('index')!
+	reindex_files(dir_list, index)
+}
+
 fn main() {
 	// search command
 	mut search_sub_command := Command{
@@ -51,14 +57,38 @@ fn main() {
 		default_value: ['default']
 		description: 'The index to use.'
 	})
-
 	// end search subcommand
+
+	// reindex command
+	mut reindex_sub_command := Command{
+		name: 'reindex'
+		description: 'reindex / index the file that needs to be queried.'
+		execute: call_calsen_reindex
+	}
+
+	reindex_sub_command.add_flag(Flag{
+		flag: .string_array
+		name: 'dir'
+		abbrev: 'd'
+		required: true
+		description: 'The directory to index'
+	})
+
+	reindex_sub_command.add_flag(Flag{
+		flag: .string
+		name: 'index'
+		abbrev: 'i'
+		description: 'The name of the index where the data will be stored.'
+		default_value: ['default']
+	})
+	// end reindex sub command
 
 	mut app := Command{
 		name: 'calsen'
 		description: 'A search engine for files.'
 		commands: [
 			search_sub_command,
+			reindex_sub_command,
 		]
 	}
 
