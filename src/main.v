@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 module main
 
 import cli { Command, Flag }
+import config { parse_config_file }
 import os
 
 fn call_calsen_search(cmd Command) ! {
@@ -31,6 +32,12 @@ fn call_calsen_reindex(cmd Command) ! {
 	dir_list := cmd.flags.get_strings('dir')!
 	index := cmd.flags.get_string('index')!
 	reindex_files(dir_list, index)
+}
+
+[if debug]
+fn debug_stuff() {
+	c := parse_config_file('./tmp/.calsenconfig')
+	println(c.init.config.index_dir)
 }
 
 fn main() {
@@ -92,6 +99,7 @@ fn main() {
 		]
 	}
 
+	debug_stuff()
 	app.setup()
 	app.parse(os.args)
 }
