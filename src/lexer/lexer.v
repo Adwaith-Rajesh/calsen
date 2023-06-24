@@ -16,9 +16,6 @@ fn find_token_re(file_contents string, pattern string, shared tokens []string) {
 	}
 }
 
-fn find_words(file_contents string, shared tokens []string) {
-}
-
 pub fn file_contents_to_tokens(file_contents string) []string {
 	shared tokens := []string{}
 	// find all numbers

@@ -22,6 +22,7 @@ import cli { Command, Flag }
 import config { parse_config_file }
 import indexer { get_files_to_index }
 import lexer { file_contents_to_tokens }
+import tf_idf { calc_tf_scores_of_file }
 import os
 
 fn call_calsen_search(cmd Command) ! {
@@ -46,7 +47,10 @@ fn debug_stuff() {
 
 	for f in f_list {
 		file_contents := os.read_file(f) or { panic(err) }
-		println(file_contents_to_tokens(file_contents))
+		a := calc_tf_scores_of_file(file_contents_to_tokens(file_contents))
+		for tok, tf_score in a {
+			println('${tok} : ${tf_score:.12}')
+		}
 	}
 }
 
