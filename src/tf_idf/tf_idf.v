@@ -11,3 +11,5 @@ pub fn calc_tf_scores_of_file(tokens []string) map[string]f64 {
 	}
 	return tf_score
 }
+
+pub fn calc_tf_idf_score() {}
