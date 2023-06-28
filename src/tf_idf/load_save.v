@@ -5,7 +5,9 @@ import x.json2
 
 pub fn dump_tf_idf(data map[string]map[string]f64, filepath string) {
 	// this has to be stupid
-	os.write_file(filepath, data.str()) or { panic(err) }
+	// I can safely replace the the quotes, as the lexer ignore all
+	// special characters
+	os.write_file(filepath, data.str().replace("'", '"')) or { panic(err) }
 }
 
 pub fn load_tf_idf(filepath string) map[string]map[string]f64 {
