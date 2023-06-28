@@ -4,7 +4,7 @@ module lexer
 
 import regex
 
-fn find_token_re(file_contents string, pattern string, shared tokens []string) {
+pub fn find_token_re(file_contents string, pattern string, shared tokens []string) {
 	mut re, err_num, err_msg := regex.regex_base(pattern)
 	if err_num != 0 {
 		panic('cannot maker regular expression: ${err_msg}')

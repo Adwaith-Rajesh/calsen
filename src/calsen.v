@@ -4,8 +4,8 @@ module main
 
 import indexer { get_files_to_index }
 import parsers { get_file_parser }
-import lexer { file_contents_to_tokens }
-import tf_idf { calc_tf_scores_of_file, dump_tf_idf }
+import lexer { file_contents_to_tokens, find_token_re }
+import tf_idf { calc_tf_idf_score, calc_tf_scores_of_file, dump_tf_idf, load_tf_idf }
 
 fn calc_tf_score_for_file(filepath string, shared tf_map map[string]map[string]f64) {
 	parser := get_file_parser(filepath) or { return }
@@ -34,6 +34,20 @@ fn reindex_files(dir_list []string, index string) {
 	}
 }
 
-fn search_files(query string, indexes []string) {
-	println('Called search files with the query: ${query}, index: ${indexes}')
+fn search_files(query string, index string) {
+	tf_map := load_tf_idf(index)
+
+	shared q_tokens := []string{}
+	nums := spawn find_token_re(query, r'[0-9]+', shared q_tokens)
+	words := spawn find_token_re(query, r'[a-zA-Z]+', shared q_tokens)
+	nums.wait()
+	words.wait()
+
+	tokens := lock {
+		q_tokens
+	}
+
+	tokens.map(it.to_lower())
+
+	println(calc_tf_idf_score(tf_map, tokens))
 }

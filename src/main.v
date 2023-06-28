@@ -22,7 +22,7 @@ import cli { Command, Flag }
 import os
 
 fn call_calsen_search(cmd Command) ! {
-	indexes := cmd.flags.get_strings('index')!
+	indexes := cmd.flags.get_string('index')!
 	query := cmd.flags.get_string('query')!
 	search_files(query, indexes)
 }
