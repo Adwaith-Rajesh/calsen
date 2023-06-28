@@ -19,8 +19,6 @@ fn calc_tf_score_for_file(filepath string, shared tf_map map[string]map[string]f
 }
 
 fn reindex_files(dir_list []string, index string) {
-	println('Called reindex files with ${dir_list}, index: ${index}')
-
 	shared tf_map := map[string]map[string]f64{}
 
 	file_list := get_files_to_index(dir_list)

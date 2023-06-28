@@ -50,7 +50,7 @@ fn main() {
 	})
 
 	search_sub_command.add_flag(Flag{
-		flag: .string_array
+		flag: .string
 		name: 'index'
 		abbrev: 'i'
 		required: false
