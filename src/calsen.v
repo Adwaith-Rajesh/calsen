@@ -49,5 +49,8 @@ fn search_files(query string, index string) {
 
 	tokens.map(it.to_lower())
 
-	println(calc_tf_idf_score(tf_map, tokens))
+	files := calc_tf_idf_score(tf_map, tokens)
+	for file in files {
+		println(file)
+	}
 }
