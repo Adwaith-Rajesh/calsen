@@ -20,4 +20,37 @@ Why rewrite the [previous project](https://github.com/Adwaith-Rajesh/calsen/tree
 
 ---
 
+## Usage
+
+### Building
+
+> Make sure you have installed V
+
+- Clone the repo and cd into it
+
+```console
+git clone --depth=1 https://github.com/Adwaith-Rajesh/calsen
+cd calsen
+```
+
+- Build the exe
+
+```console
+v -keepc -prod .
+```
+
+### Making the index
+
+```console
+./calsen reindex -dir /path/to/dir -dir /path/to/another/dir -i calsen.index
+```
+
+### Searching for files
+
+```console
+./calsen search -i ./calsen.index -q 'the query to search'
+```
+
+> This will print out a list of file that match the query with the most relevant filename first
+
 Bye .....
