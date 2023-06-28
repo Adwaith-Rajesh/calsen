@@ -21,9 +21,9 @@ module main
 import cli { Command, Flag }
 import config { parse_config_file }
 import indexer { get_files_to_index }
-import lexer
-import tf_idf
-import parsers { get_file_parser }
+import lexer { file_contents_to_tokens }
+import tf_idf { calc_tf_scores_of_file, dump_tf_idf }
+import parsers
 import os
 
 fn call_calsen_search(cmd Command) ! {
@@ -43,15 +43,20 @@ fn debug_stuff() {
 	c := parse_config_file('./tmp/.calsenconfig')
 	println(c.init.config.index_dir)
 	println('file_list')
-	f_list := get_files_to_index(['./src', './tmp', '/tmp/code_test/calsen-main'])
+	f_list := get_files_to_index(['./src', './tmp', '/tmp/code_test/calsen'])
 	println(f_list)
 
-	// for f in f_list {
-	// 	file_contents := os.read_file(f) or { panic(err) }
-	// 	a := calc_tf_scores_of_file(file_contents_to_tokens(file_contents))
-	// 	println(a)
-	// }
-	println(get_file_parser('./README.md'))
+	mut tf_idf_file_list := map[string]map[string]f64{}
+
+	for f in f_list {
+		file_contents := os.read_file(f) or { panic(err) }
+		a := calc_tf_scores_of_file(file_contents_to_tokens(file_contents))
+		// println(a)
+		tf_idf_file_list[f] = &a
+	}
+
+	dump_tf_idf(tf_idf_file_list, './calsen.index')
+	// println(get_file_parser('./README.md'))
 }
 
 fn main() {
