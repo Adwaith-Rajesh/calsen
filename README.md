@@ -3,12 +3,6 @@
 ---
 
 A search engine to search for local files based on their contents and not just their file names.
-
-- STILL IN DEV, ANYTHING CAN CHANGE AT ANY TIME. Features can be added or removed
-  w/o notice, the docs provided below are for the last released version, and may not work as expected for the main branch.
-
-- Calsen will be redesigned from scratch in V.
-
 ---
 
 ### Road Map
